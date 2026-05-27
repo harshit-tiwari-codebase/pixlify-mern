@@ -22,7 +22,13 @@ const connectToDb = require("./config/database");
 connectToDb();
 
 
+/**
+ * integrating auth router here 
+ * and auth api prefix middleware
+ */
 
+const authRouter = require("./routes/auth.routes");
 
+app.use("/api/auth" ,authRouter );
 
 module.exports = app;

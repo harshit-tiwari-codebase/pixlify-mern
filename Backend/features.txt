@@ -1,0 +1,16 @@
+User Authentication ==>
+    - register 
+    - login 
+    - logout (using the  token blacklisting)
+    - otp generation for authentication 
+
+Post==>
+   - create post 
+   - like post 
+   - save post 
+   - can see feed
+
+User ==>
+   - Followers
+   - Following
+   
