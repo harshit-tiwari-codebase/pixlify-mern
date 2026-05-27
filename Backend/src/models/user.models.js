@@ -10,9 +10,9 @@ const userSchema = mongoose.Schema({
     type: String,
     unique: [true, "email already exist"],
     match: [
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/,
-      "email invalid format",
-    ],
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  "email invalid format"
+],
     required: [true, "the email must be required"],
   },
   password: {

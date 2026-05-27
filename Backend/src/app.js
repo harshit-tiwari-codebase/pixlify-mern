@@ -31,4 +31,9 @@ const authRouter = require("./routes/auth.routes");
 
 app.use("/api/auth" ,authRouter );
 
+/**
+ * middleware to store the token in cookie storage
+ */
+const cookie = require("cookie-parser");
+
 module.exports = app;
