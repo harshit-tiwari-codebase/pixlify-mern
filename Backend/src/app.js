@@ -28,8 +28,17 @@ connectToDb();
  */
 
 const authRouter = require("./routes/auth.routes");
-
 app.use("/api/auth" ,authRouter );
+
+
+/**
+ * integrating the post router here 
+ * and post api prefix middleware 
+ */
+
+const postRouter = require("./routes/post.routes");
+app.use("/api/posts" , postRouter);
+
 
 /**
  * middleware to store the token in cookie storage
