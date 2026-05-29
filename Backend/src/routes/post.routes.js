@@ -8,12 +8,16 @@ const multer = require("multer");
 
 const upload = multer({storage:multer.memoryStorage() });
 
+
+
+
+
 /**
  * Post api
  */
 
 postRouter.post(
-  "/",
+  "/", 
 
   upload.single("image"),
 

@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
 
+
 const postSchema = new mongoose.Schema({
   caption: {
     type: String,
     trim : true
   },
-  post_url: {
+  postUrl: {
     type: String,
     required: [true, "didnot post without image"],
   },
 //   post_date: {
 //     type: Date,
 //   },
-  user_id: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "pixlify-user",
     required: [true, "can not create any post without user id "],
