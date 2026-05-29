@@ -64,10 +64,7 @@ async function PostCreate(req, res) {
      * Upload image to ImageKit
      */
     const uploadedFile = await imagekit.files.upload({
-      file: await toFile(
-        req.file.buffer,
-        req.file.originalname
-      ),
+      file: await toFile(req.file.buffer, req.file.originalname),
       fileName: req.file.originalname,
       folder: "pixlifyPost",
     });
@@ -98,6 +95,91 @@ async function PostCreate(req, res) {
   }
 }
 
+async function GetPost(req, res) {
+  const token = req.cookies["login-cookie"];
+  if (!token) {
+    return res.status(401).json({
+      message: "Authentication token is required",
+    });
+  }
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (e) {
+    return res.status(401).json({
+      message: "invalid token or token expired",
+    });
+  }
+
+  const user = decoded.id;
+
+  let userPost = null;
+  try {
+    userPost = await PostModel.find({ userId: user });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+
+  res.status(200).json({
+    message: "Posts fetched successfully",
+    posts: userPost,
+  });
+}
+
+async function GetPostDets(req, res) {
+  try{
+    const token = req.cookies["login-cookie"];
+  if (!token) {
+    return res.status(401).json({
+      message: "Authentication token is required",
+    });
+  }
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (e) {
+    return res.status(401).json({
+      message: "invalid token or token expired",
+    });
+  }
+
+  const userId = decoded.id;
+
+  const postId = req.params.postId;
+
+  const post = await PostModel.findOne({ _id: postId });
+
+  if (!post) {
+    return res.status(404).json({
+      message: "post not found",
+    });
+  }
+
+  const isAccessValid = post.userId.toString() === decoded.id.toString();
+  if (!isAccessValid) {
+    return res.status(403).json({
+      message: "forbidden content ",
+    });
+  }
+
+  res.status(200).json({
+    message: "post fetched on the basis of postId",
+    post,
+  });
+  }
+  catch(e){
+    return res.status(500).json({
+        message: error.message
+    })
+  }
+}
+
 module.exports = {
   PostCreate,
+  GetPost,
+  GetPostDets,
 };
