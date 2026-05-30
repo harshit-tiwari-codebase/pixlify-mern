@@ -14,34 +14,8 @@ const imagekit = new ImageKit({
  * Create a new post
  */
 async function PostCreate(req, res) {
-  try {
-    /**
-     * Get authentication token from cookies
-     */
-    const token = req.cookies["login-cookie"];
-
-    /**
-     * Check if token exists
-     */
-    if (!token) {
-      return res.status(401).json({
-        message: "Authentication token is required",
-      });
-    }
-
-    /**
-     * Verify JWT token
-     */
-    let decoded;
-
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      return res.status(401).json({
-        message: "Invalid or expired token",
-      });
-    }
-
+  
+try{
     /**
      * Validate caption
      */
@@ -75,7 +49,7 @@ async function PostCreate(req, res) {
     const post = await PostModel.create({
       caption: req.body.caption,
       postUrl: uploadedFile.url,
-      userId: decoded.id,
+      userId: req.user.id,
     });
 
     /**
@@ -96,23 +70,9 @@ async function PostCreate(req, res) {
 }
 
 async function GetPost(req, res) {
-  const token = req.cookies["login-cookie"];
-  if (!token) {
-    return res.status(401).json({
-      message: "Authentication token is required",
-    });
-  }
-  let decoded;
+  
 
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (e) {
-    return res.status(401).json({
-      message: "invalid token or token expired",
-    });
-  }
-
-  const user = decoded.id;
+  const user = req.user.id; 
 
   let userPost = null;
   try {
@@ -130,51 +90,41 @@ async function GetPost(req, res) {
 }
 
 async function GetPostDets(req, res) {
-  try{
-    const token = req.cookies["login-cookie"];
-  if (!token) {
-    return res.status(401).json({
-      message: "Authentication token is required",
-    });
-  }
-  let decoded;
 
+ 
+  
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (e) {
-    return res.status(401).json({
-      message: "invalid token or token expired",
+    const userId = req.user.id;
+    const postId = req.params.postId;
+
+    const post = await PostModel.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        message: "Post not found",
+      });
+    }
+
+   
+    
+
+    const isAccessValid =
+      post.userId.toString() === userId.toString();
+
+    if (!isAccessValid) {
+      return res.status(403).json({
+        message: "Forbidden content",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Post fetched successfully",
+      post,
     });
-  }
-
-  const userId = decoded.id;
-
-  const postId = req.params.postId;
-
-  const post = await PostModel.findOne({ _id: postId });
-
-  if (!post) {
-    return res.status(404).json({
-      message: "post not found",
-    });
-  }
-
-  const isAccessValid = post.userId.toString() === decoded.id.toString();
-  if (!isAccessValid) {
-    return res.status(403).json({
-      message: "forbidden content ",
-    });
-  }
-
-  res.status(200).json({
-    message: "post fetched on the basis of postId",
-    post,
-  });
-  }
-  catch(e){
+  } catch (error) {
     return res.status(500).json({
-        message: error.message
-    })
+      message: error.message,
+    });
   }
 }
 

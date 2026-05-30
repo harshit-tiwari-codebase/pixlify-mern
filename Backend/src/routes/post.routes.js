@@ -8,7 +8,7 @@ const multer = require("multer");
 
 const upload = multer({storage:multer.memoryStorage() });
 
-
+const identifyUser = require("../middlewares/auth.middleware")
 
 
 
@@ -17,19 +17,19 @@ const upload = multer({storage:multer.memoryStorage() });
  */
 
 postRouter.post(
-  "/", upload.single("image"),post_controller.PostCreate,
+  "/", upload.single("image"),identifyUser,post_controller.PostCreate,
 );
 
 /**
  *GET  /api/posts/  [protected : means the token based]
  */
-postRouter.get("/" , post_controller.GetPost  );
+postRouter.get("/",identifyUser , post_controller.GetPost  );
 
 /**
  * GET /api/posts/details/:postId
  */
 
-postRouter.get("/details/:postId" , post_controller.GetPostDets )
+postRouter.get("/details/:postId",identifyUser , post_controller.GetPostDets )
 
 
 module.exports = postRouter;

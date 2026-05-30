@@ -1,12 +1,12 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
-
 const app = express();
-
 app.use(express.json());
 
 // Register cookie-parser middleware
+const cookieParser = require("cookie-parser");
 app.use(cookieParser());
+
+
 
 const connectToDb = require("./config/database");
 connectToDb();
