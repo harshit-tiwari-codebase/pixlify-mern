@@ -56,7 +56,7 @@ async function followUSerController(req, res) {
       followee: followeeId,
     });
 
-    res.status(200).json({
+    res.status(201).json({
       message: `You follwed  ${followeeId} successfully`,
       follow: follow,
     });
@@ -68,7 +68,8 @@ async function followUSerController(req, res) {
 }
 
 async function unfollowUserController(req, res) {
-  const followerId = req.user.username;
+ try {
+     const followerId = req.user.username;
 
   const followeeId = req.params.username;
 
@@ -88,10 +89,49 @@ async function unfollowUserController(req, res) {
     res.status(200).json({
         message: `You unfollowed ${followeeId}`
     })
+ } catch (error) {
+     return res.status(500).json({
+      message: error.message,
+    });
+ }
 
+}
+
+async function getfollowersController(req , res) {
+    const username = req.params.username;
+
+    const followers = await followModel
+  .find({ followee: username })
+  .select("follower -_id");
+
+    res.status(200).json({
+        count : followers.length,
+        followers
+    })
+}
+
+async function getFollowingController(req, res) {
+  try {
+    const username = req.params.username;
+
+    const following = await followModel.find({
+      follower: username,
+    });
+
+    return res.status(200).json({
+      count: following.length,
+      following,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
 }
 
 module.exports = {
   followUSerController,
-  unfollowUserController
+  unfollowUserController,
+  getfollowersController,
+  getFollowingController
 };
