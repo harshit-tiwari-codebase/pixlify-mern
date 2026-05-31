@@ -36,6 +36,7 @@ const jwt = require("jsonwebtoken");
     const token = jwt.sign(
       {
         id: user._id,
+        username : user.username
       },
       process.env.JWT_SECRET,
       {
@@ -79,7 +80,7 @@ const loginController = async (req, res) => {
    }
 
    const token = jwt.sign({
-    id : isUserExist._id 
+    id : isUserExist._id ,  username : isUserExist.username
    },process.env.JWT_SECRET , {expiresIn : "1d"} );
 
    res.cookie("login-cookie" , token );

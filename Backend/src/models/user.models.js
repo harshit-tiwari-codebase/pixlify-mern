@@ -10,9 +10,9 @@ const userSchema = mongoose.Schema({
     type: String,
     unique: [true, "email already exist"],
     match: [
-  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-  "email invalid format"
-],
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      "email invalid format",
+    ],
     required: [true, "the email must be required"],
   },
   password: {
@@ -25,9 +25,9 @@ const userSchema = mongoose.Schema({
     type: String,
     default:
       "https://ik.imagekit.io/zt6xsh95q/5abd985735a8fd4adcb0e795de6a1005.jpg",
-  },
+  }
 });
 
-const userModel = mongoose.model("pixlify-user",userSchema);
+const userModel = mongoose.model("pixlify-user", userSchema);
 
 module.exports = userModel;

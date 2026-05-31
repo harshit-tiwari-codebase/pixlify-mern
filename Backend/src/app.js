@@ -11,10 +11,20 @@ app.use(cookieParser());
 const connectToDb = require("./config/database");
 connectToDb();
 
-const authRouter = require("./routes/auth.routes");
-app.use("/api/auth", authRouter);
 
+/**
+ * requiring routes
+ */
+const authRouter = require("./routes/auth.routes");
+const followRouter = require("./routes/user.routes");
 const postRouter = require("./routes/post.routes");
+
+/**
+ * using routes
+ */
+app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/user", followRouter);
+
 
 module.exports = app;

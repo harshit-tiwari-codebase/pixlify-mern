@@ -10,15 +10,13 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: [true, "didnot post without image"],
   },
-//   post_date: {
-//     type: Date,
-//   },
+
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "pixlify-user",
     required: [true, "can not create any post without user id "],
   },
-});
+},{timestamps : true});
 
 const PostModel = mongoose.model("Post", postSchema);
 
