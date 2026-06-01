@@ -31,5 +31,14 @@ postRouter.get("/",identifyUser , post_controller.GetPost  );
 
 postRouter.get("/details/:postId",identifyUser , post_controller.GetPostDets )
 
+/**
+ * POST /api/like/:postId
+ */
+postRouter.post("/like/:postId" , identifyUser , post_controller.likePost)
+
+/**
+ * POST /api/dislike/:postId
+ */
+postRouter.post("/dislike/:postId" , identifyUser , post_controller.dislikePost)
 
 module.exports = postRouter;

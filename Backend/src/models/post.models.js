@@ -16,6 +16,10 @@ const postSchema = new mongoose.Schema({
     ref: "pixlify-user",
     required: [true, "can not create any post without user id "],
   },
+     likesCount: {
+      type: Number,
+      default: 0,
+    },
 },{timestamps : true});
 
 const PostModel = mongoose.model("Post", postSchema);

@@ -1,4 +1,5 @@
 const PostModel = require("../models/post.models");
+const likeModel = require("../models/like.model");
 const ImageKit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
 const jwt = require("jsonwebtoken");
@@ -14,8 +15,7 @@ const imagekit = new ImageKit({
  * Create a new post
  */
 async function PostCreate(req, res) {
-  
-try{
+  try {
     /**
      * Validate caption
      */
@@ -70,9 +70,7 @@ try{
 }
 
 async function GetPost(req, res) {
-  
-
-  const user = req.user.id; 
+  const user = req.user.id;
 
   let userPost = null;
   try {
@@ -90,9 +88,6 @@ async function GetPost(req, res) {
 }
 
 async function GetPostDets(req, res) {
-
- 
-  
   try {
     const userId = req.user.id;
     const postId = req.params.postId;
@@ -105,11 +100,7 @@ async function GetPostDets(req, res) {
       });
     }
 
-   
-    
-
-    const isAccessValid =
-      post.userId.toString() === userId.toString();
+    const isAccessValid = post.userId.toString() === userId.toString();
 
     if (!isAccessValid) {
       return res.status(403).json({
@@ -128,8 +119,103 @@ async function GetPostDets(req, res) {
   }
 }
 
+async function likePost(req, res) {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+
+    /**
+     * Validate Post
+     */
+    const post = await PostModel.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    /**
+     * Check if already liked
+     */
+    const existingLike = await likeModel.findOne({
+      postId,
+      userId,
+    });
+
+    if (existingLike) {
+      return res.status(409).json({
+        success: false,
+        message: "Post already liked",
+      });
+    }
+
+    /**
+     * Create Like
+     */
+    const like = await likeModel.create({
+      postId,
+      userId,
+    });
+    await PostModel.findByIdAndUpdate(postId, {
+      $inc: {
+        likesCount: 1,
+      },
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Post liked successfully",
+      data: like,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+async function dislikePost(req, res) {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+
+    const deletedLike = await likeModel.findOneAndDelete({
+      postId,
+      userId,
+    });
+
+    if (!deletedLike) {
+      return res.status(404).json({
+        success: false,
+        message: "You have not liked this post",
+      });
+    }
+
+    await PostModel.findByIdAndUpdate(postId, {
+      $inc: {
+        likesCount: -1,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Post unliked successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   PostCreate,
   GetPost,
   GetPostDets,
+  likePost,
+  dislikePost,
 };
