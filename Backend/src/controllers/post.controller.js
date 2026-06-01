@@ -212,10 +212,29 @@ async function dislikePost(req, res) {
   }
 }
 
+async function getFeed(req, res) {
+  try {
+    const posts = await PostModel.find().populate("userId");
+  
+
+    res.status(200).json({
+      success: true,
+      message: "Posts fetched successfully",
+      posts,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   PostCreate,
   GetPost,
   GetPostDets,
   likePost,
   dislikePost,
+  getFeed
 };

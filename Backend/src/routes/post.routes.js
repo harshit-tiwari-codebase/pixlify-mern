@@ -41,4 +41,9 @@ postRouter.post("/like/:postId" , identifyUser , post_controller.likePost)
  */
 postRouter.post("/dislike/:postId" , identifyUser , post_controller.dislikePost)
 
+/**
+ * GET /api/posts/getFeed
+ */
+postRouter.get("/getfeed" , identifyUser , post_controller.getFeed)
+
 module.exports = postRouter;
