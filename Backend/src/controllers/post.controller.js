@@ -211,11 +211,25 @@ async function dislikePost(req, res) {
     });
   }
 }
-
 async function getFeed(req, res) {
   try {
-    const posts = await PostModel.find().populate("userId");
-  
+    const userId = req.user.id;
+
+    const posts = await Promise.all(
+      (
+        await PostModel.find().populate("userId").lean()
+      ).map(async (post) => {
+        const isLiked = await likeModel.findOne({
+          postId: post._id,
+          userId,
+        });
+
+        return {
+          ...post,
+          isLiked: !!isLiked,
+        };
+      })
+    );
 
     res.status(200).json({
       success: true,
@@ -229,7 +243,6 @@ async function getFeed(req, res) {
     });
   }
 }
-
 module.exports = {
   PostCreate,
   GetPost,
