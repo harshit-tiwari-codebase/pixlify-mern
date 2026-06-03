@@ -6,30 +6,31 @@ const post_controller = require("../controllers/post.controller");
 
 const multer = require("multer");
 
-const upload = multer({storage:multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() });
 
-const identifyUser = require("../middlewares/auth.middleware")
-
-
+const identifyUser = require("../middlewares/auth.middleware");
 
 /**
  * Post api
  */
 
 postRouter.post(
-  "/", upload.single("image"),identifyUser,post_controller.PostCreate,
+  "/",
+  upload.single("image"),
+  identifyUser,
+  post_controller.PostCreate,
 );
 
 /**
  *GET  /api/posts/  [protected : means the token based]
  */
-postRouter.get("/",identifyUser , post_controller.GetPost  );
+postRouter.get("/", identifyUser, post_controller.GetPost);
 
 /**
  * GET /api/posts/details/:postId
  */
 
-postRouter.get("/details/:postId",identifyUser , post_controller.GetPostDets )
+postRouter.get("/details/:postId", identifyUser, post_controller.GetPostDets);
 
 /**
  * POST /api/toggle-like/:postId
@@ -37,12 +38,12 @@ postRouter.get("/details/:postId",identifyUser , post_controller.GetPostDets )
 postRouter.post(
   "/toggle-like/:postId",
   identifyUser,
-  post_controller.toggleLike
+  post_controller.toggleLike,
 );
 
 /**
  * GET /api/posts/getFeed
  */
-postRouter.get("/getfeed" , identifyUser , post_controller.getFeed)
+postRouter.get("/getfeed", identifyUser, post_controller.getFeed);
 
 module.exports = postRouter;

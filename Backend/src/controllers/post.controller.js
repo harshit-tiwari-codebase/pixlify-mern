@@ -120,6 +120,7 @@ async function GetPostDets(req, res) {
 }
 async function toggleLike(req, res) {
   try {
+
     const { postId } = req.params;
     const userId = req.user.id;
 
@@ -131,7 +132,7 @@ async function toggleLike(req, res) {
         message: "Post not found",
       });
     }
-
+    
     const existingLike = await likeModel.findOne({
       postId,
       userId,
@@ -165,22 +166,21 @@ async function toggleLike(req, res) {
       liked: true,
       message: "Post liked",
     });
-
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
+
+
+  return res.status(500).json({
+    success: false,
+    message: error.message,
+  });
+}
 }
 async function getFeed(req, res) {
   try {
     const userId = req.user.id;
 
     const posts = await Promise.all(
-      (
-        await PostModel.find().populate("userId").lean()
-      ).map(async (post) => {
+      (await PostModel.find().populate("userId").lean()).map(async (post) => {
         const isLiked = await likeModel.findOne({
           postId: post._id,
           userId,
@@ -190,7 +190,7 @@ async function getFeed(req, res) {
           ...post,
           isLiked: !!isLiked,
         };
-      })
+      }),
     );
 
     res.status(200).json({
@@ -210,5 +210,5 @@ module.exports = {
   GetPost,
   GetPostDets,
   toggleLike,
-  getFeed
+  getFeed,
 };
