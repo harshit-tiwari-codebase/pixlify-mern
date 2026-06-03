@@ -12,6 +12,8 @@ export async function getFeed() {
 }
 
 export async function toggleLike(postId) {
+    console.log(postId)
     const response = await api.post(`/toggle-like/${postId}`);
     return response.data;
+    console.log(response.data)
 }

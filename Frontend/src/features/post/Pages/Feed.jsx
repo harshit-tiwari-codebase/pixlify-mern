@@ -15,7 +15,7 @@ const Feed = () => {
 
   return (
     <div className="w-full min-h-screen bg-black flex flex-col items-center">
-      <div className="w-full max-w-md lg:max-w-xl">
+      <div className="w-full max-w-md lg:max-w-3xl">
         <Navbar />
 
         <div className="flex flex-col gap-5 px-2">
