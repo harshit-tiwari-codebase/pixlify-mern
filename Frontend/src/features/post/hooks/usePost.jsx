@@ -1,6 +1,8 @@
 import { getFeed, toggleLike } from "../services/post.api";
 import { useContext } from "react";
 import { PostContext } from "../post.context";
+import { createPost } from "../services/post.api";
+import { toast } from "react-hot-toast";
 
 export const usePost = () => {
   const context = useContext(PostContext);
@@ -50,11 +52,28 @@ export const usePost = () => {
     }
   };
 
+  async function handleCreatePost(caption, image) {
+  try {
+    const data = await createPost(caption, image);
+
+    toast.success(data.message);
+
+    return data;
+
+
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message || "Failed to create post"
+    );
+  }
+}
+
   return {
     loading,
     post,
     feed,
     handleGetFeed,
     handleToggleLike,
+    handleCreatePost
   };
 };

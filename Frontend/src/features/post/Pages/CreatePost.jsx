@@ -1,11 +1,31 @@
 import React, { useState } from "react";
+import { usePost } from "../hooks/usePost";
 import { ArrowLeft, ChevronRight, HashIcon, LocationEdit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
   const [image, setimage] = useState(null);
   const navigate = useNavigate();
+  const [caption, setCaption] = useState("");
+  const { handleCreatePost } = usePost();
+  const [loading, setLoading] = useState(false);
 
+  async function submitHandler() {
+    if (!caption.trim()) return;
+    if (!image) return;
+
+    try {
+      setLoading(true);
+      await handleCreatePost(caption, image);
+
+      setCaption("");
+      setimage(null);
+
+      navigate("/");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <div className="w-full min-h-screen flex justify-center bg-black text-amber-50">
       <div className="createPost-container w-full max-w-md lg:max-w-4xl xl:max-w-5xl">
@@ -34,7 +54,7 @@ const CreatePost = () => {
           <div className="preview w-full h-96 lg:w-3/4 lg:h-125 mx-auto rounded-2xl overflow-hidden">
             {image ? (
               <img
-                src="https://images.unsplash.com/photo-1780090329252-d2dbf799bfa7?w=600&auto=format&fit=crop&q=60"
+                src={URL.createObjectURL(image)}
                 alt="preview"
                 className="w-full h-full object-cover"
               />
@@ -71,26 +91,28 @@ const CreatePost = () => {
           <div className="caption w-full lg:w-3/4 mx-auto bg-black mt-8">
             <div className="flex justify-between items-center mb-3">
               <h1 className="text-xl font-bold">Caption</h1>
-              <h3 className="text-xl">0/280</h3>
+              <h3 className="text-xl">{caption.length}/280</h3>
             </div>
 
             <textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
               className="
-                w-full
-                h-32
-                lg:h-40
-                bg-zinc-900
-                rounded-xl
-                p-4
-                text-white
-                placeholder:text-zinc-500
-                resize-none
-                outline-none
-                border
-                border-zinc-800
-                focus:border-zinc-700
-                mt-4
-              "
+    w-full
+    h-32
+    lg:h-40
+    bg-zinc-900
+    rounded-xl
+    p-4
+    text-white
+    placeholder:text-zinc-500
+    resize-none
+    outline-none
+    border
+    border-zinc-800
+    focus:border-zinc-700
+    mt-4
+  "
               placeholder="What's happening?"
             />
 
@@ -111,8 +133,12 @@ const CreatePost = () => {
             </div>
 
             <div className="flex justify-center mt-8 lg:w-full">
-              <button className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition-all duration-200 font-semibold text-white">
-                Share Post
+              <button
+                disabled={loading}
+                onClick={submitHandler}
+                className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 transition-all duration-200 font-semibold text-white"
+              >
+                {loading ? "Uploading..." : "Share Post"}
               </button>
             </div>
           </div>
