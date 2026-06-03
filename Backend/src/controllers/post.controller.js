@@ -123,7 +123,7 @@ async function toggleLike(req, res) {
 
     const { postId } = req.params;
     const userId = req.user.id;
-
+    console.log(userId)
     const post = await PostModel.findById(postId);
 
     if (!post) {

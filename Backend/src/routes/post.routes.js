@@ -16,9 +16,9 @@ const identifyUser = require("../middlewares/auth.middleware");
 
 postRouter.post(
   "/",
-  upload.single("image"),
   identifyUser,
-  post_controller.PostCreate,
+  upload.single("image"),
+  post_controller.PostCreate
 );
 
 /**
