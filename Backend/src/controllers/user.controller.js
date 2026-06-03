@@ -129,9 +129,14 @@ async function getFollowingController(req, res) {
   }
 }
 
+async function getUserProfile (req , res){
+  const {username} = req.params;
+}
+
 module.exports = {
   followUSerController,
   unfollowUserController,
   getfollowersController,
-  getFollowingController
+  getFollowingController,
+  getUserProfile
 };

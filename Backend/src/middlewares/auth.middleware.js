@@ -5,7 +5,10 @@ async function identifyUser (req,res,next){
         /**
          * Get authentication token from cookies
          */
-        const token = req.cookies["login-cookie"];
+        const token =
+          req.cookies["auth-token"] ||
+          req.cookies["login-cookie"] ||
+          req.cookies["register-cookie"];
     
         /**
          * Check if token exists

@@ -1,7 +1,9 @@
 const crypto = require("crypto");
 const userModel = require("../models/user.models");
 const jwt = require("jsonwebtoken");
+const PostModel  =  require("../models/post.models")
 
+const AUTH_COOKIE_NAME = "auth-token";
 
 
 /**
@@ -43,11 +45,17 @@ const jwt = require("jsonwebtoken");
         expiresIn: "1d",
       },
     );
-    res.cookie("register-cookie", token);
+    res.cookie(AUTH_COOKIE_NAME, token);
 
     return res.status(201).json({
       message: "user registered successfully ",
-      user,
+      user: {
+        user: user.username,
+        email: user.email,
+        bio: user.bio,
+        profile: user.profile_img,
+        posts: [],
+      },
       token,
     });
   } catch (error) {
@@ -83,11 +91,18 @@ const loginController = async (req, res) => {
     id : isUserExist._id ,  username : isUserExist.username
    },process.env.JWT_SECRET , {expiresIn : "1d"} );
 
-   res.cookie("login-cookie" , token );
+   res.cookie(AUTH_COOKIE_NAME , token );
 
    return res.status(200).json({
       message: "Login successful",
-      token
+      token,
+      user: {
+        user: isUserExist.username,
+        email: isUserExist.email,
+        bio: isUserExist.bio,
+        profile: isUserExist.profile_img,
+        posts: [],
+      },
     });
 
  } catch (error) {
@@ -96,20 +111,35 @@ const loginController = async (req, res) => {
     });
  }
 }
+const getMeController = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-const getMeController = async (req , res) => {
-  const userId = req.user.id;
+    const user = await userModel.findById(userId);
 
-  const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
 
-  res.status(200).json({
-    user : user.username,
-    email : user.email ,
-    bio : user.bio,
-    profile : user.profile_img
-  })
+    const posts = await PostModel.find({ userId })
+      .select("caption postUrl likesCount createdAt");
 
-}
+    res.status(200).json({
+      user: user.username,
+      email: user.email,
+      bio: user.bio,
+      profile: user.profile_img,
+      posts,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {registerController , loginController ,getMeController};
 

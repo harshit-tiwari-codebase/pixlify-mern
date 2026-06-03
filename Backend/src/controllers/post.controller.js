@@ -205,6 +205,8 @@ async function getFeed(req, res) {
     });
   }
 }
+
+
 module.exports = {
   PostCreate,
   GetPost,
