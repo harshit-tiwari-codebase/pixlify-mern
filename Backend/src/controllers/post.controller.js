@@ -118,15 +118,11 @@ async function GetPostDets(req, res) {
     });
   }
 }
-
-async function likePost(req, res) {
+async function toggleLike(req, res) {
   try {
     const { postId } = req.params;
     const userId = req.user.id;
 
-    /**
-     * Validate Post
-     */
     const post = await PostModel.findById(postId);
 
     if (!post) {
@@ -136,74 +132,40 @@ async function likePost(req, res) {
       });
     }
 
-    /**
-     * Check if already liked
-     */
     const existingLike = await likeModel.findOne({
       postId,
       userId,
     });
 
     if (existingLike) {
-      return res.status(409).json({
-        success: false,
-        message: "Post already liked",
+      await likeModel.findByIdAndDelete(existingLike._id);
+
+      await PostModel.findByIdAndUpdate(postId, {
+        $inc: { likesCount: -1 },
+      });
+
+      return res.status(200).json({
+        success: true,
+        liked: false,
+        message: "Post unliked",
       });
     }
 
-    /**
-     * Create Like
-     */
-    const like = await likeModel.create({
-      postId,
-      userId,
-    });
-    await PostModel.findByIdAndUpdate(postId, {
-      $inc: {
-        likesCount: 1,
-      },
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "Post liked successfully",
-      data: like,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-}
-
-async function dislikePost(req, res) {
-  try {
-    const { postId } = req.params;
-    const userId = req.user.id;
-
-    const deletedLike = await likeModel.findOneAndDelete({
+    await likeModel.create({
       postId,
       userId,
     });
 
-    if (!deletedLike) {
-      return res.status(404).json({
-        success: false,
-        message: "You have not liked this post",
-      });
-    }
-
     await PostModel.findByIdAndUpdate(postId, {
-      $inc: {
-        likesCount: -1,
-      },
+      $inc: { likesCount: 1 },
     });
 
     return res.status(200).json({
       success: true,
-      message: "Post unliked successfully",
+      liked: true,
+      message: "Post liked",
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -247,7 +209,6 @@ module.exports = {
   PostCreate,
   GetPost,
   GetPostDets,
-  likePost,
-  dislikePost,
+  toggleLike,
   getFeed
 };

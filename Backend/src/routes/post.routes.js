@@ -32,14 +32,13 @@ postRouter.get("/",identifyUser , post_controller.GetPost  );
 postRouter.get("/details/:postId",identifyUser , post_controller.GetPostDets )
 
 /**
- * POST /api/like/:postId
+ * POST /api/toggle-like/:postId
  */
-postRouter.post("/like/:postId" , identifyUser , post_controller.likePost)
-
-/**
- * POST /api/dislike/:postId
- */
-postRouter.post("/dislike/:postId" , identifyUser , post_controller.dislikePost)
+postRouter.post(
+  "/toggle-like/:postId",
+  identifyUser,
+  post_controller.toggleLike
+);
 
 /**
  * GET /api/posts/getFeed
