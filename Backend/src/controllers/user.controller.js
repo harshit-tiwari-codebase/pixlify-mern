@@ -74,30 +74,61 @@ async function toggleFollowController(req, res) {
 }
 
 async function getfollowersController(req, res) {
-  const username = req.params.username;
+  try {
+    const { id } = req.params;
 
-  const followers = await followModel
-    .find({ followee: username })
-    .select("follower -_id");
+    const user = await userModel.findById(id);
 
-  res.status(200).json({
-    count: followers.length,
-    followers,
-  });
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const followers = await followModel
+      .find({ followee: id })
+      .populate("follower", "username profile_img");
+
+    const formattedFollowers = followers.map(
+      (item) => item.follower
+    );
+
+    return res.status(200).json({
+      count: formattedFollowers.length,
+      followers: formattedFollowers,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
 }
 
 async function getFollowingController(req, res) {
   try {
-    const username = req.params.username;
+    const { id } = req.params;
 
-    const following = await followModel.find({
-      follower: username,
-    });
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const following = await followModel
+      .find({ follower: id })
+      .populate("followee", "username profile_img");
+
+    const formattedFollowing = following.map(
+      (item) => item.followee
+    );
 
     return res.status(200).json({
-      count: following.length,
-      following,
+      count: formattedFollowing.length,
+      following: formattedFollowing,
     });
+
   } catch (error) {
     return res.status(500).json({
       message: error.message,

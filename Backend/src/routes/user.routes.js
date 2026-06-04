@@ -12,10 +12,10 @@ followRouter.post("/toggle-follow/:id" , identifyUser , userController.toggleFol
 
 
 
-followRouter.get("/followers/:username" , identifyUser , userController.getfollowersController);
+followRouter.get("/getfollowers/:id" , identifyUser , userController.getfollowersController);
 
 
-followRouter.get("/following/:username" , identifyUser , userController.getFollowingController);
+followRouter.get("/getfollowing/:id" , identifyUser , userController.getFollowingController);
 
 
 

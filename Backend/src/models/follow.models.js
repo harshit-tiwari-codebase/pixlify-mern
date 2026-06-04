@@ -4,13 +4,13 @@ const followSchema = new mongoose.Schema(
   {
     follower: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "pixlify-users",
+      ref: "pixlify-user",
       required: true,
     },
 
     followee: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "pixlify-users",
+      ref: "pixlify-user",
       required: true,
     },
 
