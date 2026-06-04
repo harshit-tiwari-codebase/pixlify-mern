@@ -33,7 +33,7 @@ const Following = () => {
           <h2 className="text-xl font-bold lg:text-2xl">Following</h2>
         </div>
         <div className="px-3 py-2">
-  {user?.followers?.length > 0 ? (
+  {user?.following?.length > 0 ? (
     <div className="flex flex-col gap-1">
       {user.following.map((following) => (
         <div
@@ -80,7 +80,7 @@ const Following = () => {
               transition-colors
             "
           >
-            Following
+            {following.isFollowing ? "Following" : "Follow"}
           </button>
         </div>
       ))}

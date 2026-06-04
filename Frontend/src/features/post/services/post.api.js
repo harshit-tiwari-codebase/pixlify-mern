@@ -5,6 +5,11 @@ const api = axios.create({
     withCredentials : true
 })
 
+const userApi = axios.create({
+    baseURL:"http://localhost:3000/api/user",
+    withCredentials : true
+})
+
 
 export async function getFeed() {
     const response = await api.get("/getfeed");
@@ -12,10 +17,8 @@ export async function getFeed() {
 }
 
 export async function toggleLike(postId) {
-    console.log(postId)
     const response = await api.post(`/toggle-like/${postId}`);
     return response.data;
-    console.log(response.data)
 }
 
 
@@ -37,3 +40,8 @@ export async function createPost(caption, image) {
 
   return response.data;
 }
+
+export const toggleFollowApi = async (userId) => {
+  const response = await userApi.post(`/toggle-follow/${userId}`);
+  return response.data;
+};

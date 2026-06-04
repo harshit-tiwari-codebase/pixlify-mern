@@ -1,4 +1,4 @@
-import { getFeed, toggleLike } from "../services/post.api";
+import { getFeed, toggleLike , toggleFollowApi } from "../services/post.api";
 import { useContext } from "react";
 import { PostContext } from "../post.context";
 import { createPost } from "../services/post.api";
@@ -68,12 +68,43 @@ export const usePost = () => {
   }
 }
 
+const handleToggleFollow = async (followeeId) => {
+  try {
+    const data = await toggleFollowApi(followeeId);
+
+    setfeed((prevFeed) =>
+      prevFeed.map((post) => {
+        if (post.userId._id !== followeeId) return post;
+
+        return {
+          ...post,
+          userId: {
+            ...post.userId,
+            isFollowing: data.isFollowing,
+          },
+        };
+      })
+    );
+
+    toast.success(data.message);
+
+  } catch (error) {
+  console.log(error);
+  console.log(error.response?.data);
+
+  toast.error(
+    error.response?.data?.message || error.message
+  );
+}
+};
+
   return {
     loading,
     post,
     feed,
     handleGetFeed,
     handleToggleLike,
-    handleCreatePost
+    handleCreatePost,
+    handleToggleFollow
   };
 };

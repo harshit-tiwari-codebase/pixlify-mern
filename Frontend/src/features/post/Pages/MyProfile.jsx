@@ -15,6 +15,8 @@ const MyProfile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  console.log(user)
+
   if (!user) {
     return <ProfileSkeleton />;
   }

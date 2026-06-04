@@ -1,7 +1,7 @@
 import React from "react";
 import { Heart, MessageCircle, Send, Bookmark } from "lucide-react";
 
-const Post = ({ post , handleToggleLike}) => {
+const Post = ({ post, handleToggleLike , handleToggleFollow }) => {
   return (
     <div className="bg-black text-white border border-zinc-800 rounded-md overflow-hidden">
       {/* Header */}
@@ -16,11 +16,11 @@ const Post = ({ post , handleToggleLike}) => {
           <h2 className="text-sm font-semibold">{post.userId?.username}</h2>
 
           <button
-          onClick={()=>{
-            console.log(post.userId?._id);
-            
-          }}
-           className="px-2 py-0.5 border border-white rounded text-sm">Follow</button>
+            onClick={() => handleToggleFollow(post.userId._id)}
+            className="px-2 py-0.5 border border-white rounded text-sm"
+          >
+            {post.userId?.isFollowing ? "Following" : "Follow"}
+          </button>
         </div>
 
         <button className="text-lg font-bold">•••</button>
