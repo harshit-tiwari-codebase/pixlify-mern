@@ -139,13 +139,19 @@ const getMeController = async (req, res) => {
       .find({ follower: userId })
       .populate("followee", "username profile_img");
 
-    const followersList = followers.map(
-      (item) => item.follower
-    );
+   const followersList = followers.map((item) => ({
+  _id: item.follower._id,
+  username: item.follower.username,
+  profile_img: item.follower.profile_img,
+  isFollowing: true,
+}));
 
-    const followingList = following.map(
-      (item) => item.followee
-    );
+const followingList = following.map((item) => ({
+  _id: item.followee._id,
+  username: item.followee.username,
+  profile_img: item.followee.profile_img,
+  isFollowing: true,
+}));
 
     res.status(200).json({
       user: user.username,

@@ -73,40 +73,11 @@ async function toggleFollowController(req, res) {
   }
 }
 
-async function getfollowersController(req, res) {
-  try {
-    const { id } = req.params;
-
-    const user = await userModel.findById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const followers = await followModel
-      .find({ followee: id })
-      .populate("follower", "username profile_img");
-
-    const formattedFollowers = followers.map(
-      (item) => item.follower
-    );
-
-    return res.status(200).json({
-      count: formattedFollowers.length,
-      followers: formattedFollowers,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message,
-    });
-  }
-}
-
 async function getFollowingController(req, res) {
   try {
     const { id } = req.params;
+
+    const loggedInUserId = req.user.id;
 
     const user = await userModel.findById(id);
 
@@ -120,15 +91,71 @@ async function getFollowingController(req, res) {
       .find({ follower: id })
       .populate("followee", "username profile_img");
 
-    const formattedFollowing = following.map(
-      (item) => item.followee
+    const formattedFollowing = await Promise.all(
+      following.map(async (item) => {
+        const isFollowing = await followModel.exists({
+          follower: loggedInUserId,
+          followee: item.followee._id,
+        });
+
+        return {
+          _id: item.followee._id,
+          username: item.followee.username,
+          profile_img: item.followee.profile_img,
+          isFollowing: !!isFollowing,
+        };
+      })
     );
 
     return res.status(200).json({
       count: formattedFollowing.length,
       following: formattedFollowing,
     });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
 
+async function getFollowersController(req, res) {
+  try {
+    const { id } = req.params;
+
+    const loggedInUserId = req.user.id;
+
+    const user = await userModel.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const followers = await followModel
+      .find({ followee: id })
+      .populate("follower", "username profile_img");
+
+    const formattedFollowers = await Promise.all(
+      followers.map(async (item) => {
+        const isFollowing = await followModel.exists({
+          follower: loggedInUserId,
+          followee: item.follower._id,
+        });
+
+        return {
+          _id: item.follower._id,
+          username: item.follower.username,
+          profile_img: item.follower.profile_img,
+          isFollowing: !!isFollowing,
+        };
+      })
+    );
+
+    return res.status(200).json({
+      count: formattedFollowers.length,
+      followers: formattedFollowers,
+    });
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -142,7 +169,7 @@ async function getUserProfile(req, res) {
 
 module.exports = {
   toggleFollowController,
-  getfollowersController,
+  getFollowersController,
   getFollowingController,
   getUserProfile,
 };

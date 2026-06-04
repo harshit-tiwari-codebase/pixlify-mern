@@ -12,7 +12,7 @@ followRouter.post("/toggle-follow/:id" , identifyUser , userController.toggleFol
 
 
 
-followRouter.get("/getfollowers/:id" , identifyUser , userController.getfollowersController);
+followRouter.get("/getfollowers/:id" , identifyUser , userController.getFollowersController);
 
 
 followRouter.get("/getfollowing/:id" , identifyUser , userController.getFollowingController);
