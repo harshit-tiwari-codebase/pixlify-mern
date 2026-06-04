@@ -1,22 +1,36 @@
 const mongoose = require("mongoose");
-const { applyTimestamps } = require("./post.models");
 
-const followSchema = mongoose.Schema({
-  follower: {
-    type: String
-  },
-  followee: {
-    type: String
-  },
-   status: {
+const followSchema = new mongoose.Schema(
+  {
+    follower: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "pixlify-users",
+      required: true,
+    },
+
+    followee: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "pixlify-users",
+      required: true,
+    },
+
+    status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],
-      default: "pending",
+      default: "accepted", // public account
     },
-} , {timestamps : true } );
+  },
+  {
+    timestamps: true,
+  }
+);
 
-const followModel = mongoose.model("follow" , followSchema);
+// Prevent duplicate follows
+followSchema.index(
+  { follower: 1, followee: 1 },
+  { unique: true }
+);
 
-followSchema.index({follower:1 , followee:1},{unique:true})
+const Follow = mongoose.model("Follow", followSchema);
 
-module.exports = followModel;
+module.exports = Follow;

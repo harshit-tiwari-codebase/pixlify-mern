@@ -20,14 +20,15 @@ const followSchema = mongoose.Schema({
 
  */
 
-async function followUSerController(req, res) {
+async function toggleFollowController(req, res) {
   try {
-    const followerId = req.user.username;
+    
+    const followerId = req.user.id;
 
-    const followeeId = req.params.username;
+    const followeeId = req.params.id;
 
-    const user = await userModel.findOne({ username: followeeId });
-
+    // Searching for is Followee user exist in the database or not
+    const user = await userModel.findById(followeeId);
     if (!user) {
       return res.status(404).json({
         message: "followee is not found",
@@ -40,14 +41,19 @@ async function followUSerController(req, res) {
       });
     }
 
-    const isAlreadyFollowing = await followModel.findOne({
+    //to check the follower already following or not
+    const existingFollow = await followModel.findOne({
       follower: followerId,
       followee: followeeId,
     });
 
-    if (isAlreadyFollowing) {
-      return res.status(409).json({
-        message: `You already following ${followeeId}`,
+    //unfollow logic
+    if (existingFollow) {
+      await followModel.findByIdAndDelete(existingFollow._id);
+
+      return res.status(200).json({
+        isFollowing: false,
+        message: `You unfollowed ${user.username} successfully`,
       });
     }
 
@@ -56,9 +62,9 @@ async function followUSerController(req, res) {
       followee: followeeId,
     });
 
-    res.status(201).json({
-      message: `You follwed  ${followeeId} successfully`,
-      follow: follow,
+    return res.status(201).json({
+      isFollowing: true,
+      message: `You followed ${user.username} successfully`,
     });
   } catch (error) {
     return res.status(500).json({
@@ -67,47 +73,17 @@ async function followUSerController(req, res) {
   }
 }
 
-async function unfollowUserController(req, res) {
- try {
-     const followerId = req.user.username;
+async function getfollowersController(req, res) {
+  const username = req.params.username;
 
-  const followeeId = req.params.username;
+  const followers = await followModel
+    .find({ followee: username })
+    .select("follower -_id");
 
-  const isUserFollowing = await followModel.findOne({
-    follower: followerId,
-    followee: followeeId,
+  res.status(200).json({
+    count: followers.length,
+    followers,
   });
-  
-  if(!isUserFollowing){
-    return res.status(404).json({
-        message: `You are not following ${followeeId}`
-    })
-  }
-
-    await followModel.findByIdAndDelete(isUserFollowing._id);
-
-    res.status(200).json({
-        message: `You unfollowed ${followeeId}`
-    })
- } catch (error) {
-     return res.status(500).json({
-      message: error.message,
-    });
- }
-
-}
-
-async function getfollowersController(req , res) {
-    const username = req.params.username;
-
-    const followers = await followModel
-  .find({ followee: username })
-  .select("follower -_id");
-
-    res.status(200).json({
-        count : followers.length,
-        followers
-    })
 }
 
 async function getFollowingController(req, res) {
@@ -129,14 +105,13 @@ async function getFollowingController(req, res) {
   }
 }
 
-async function getUserProfile (req , res){
-  const {username} = req.params;
+async function getUserProfile(req, res) {
+  const { username } = req.params;
 }
 
 module.exports = {
-  followUSerController,
-  unfollowUserController,
+  toggleFollowController,
   getfollowersController,
   getFollowingController,
-  getUserProfile
+  getUserProfile,
 };

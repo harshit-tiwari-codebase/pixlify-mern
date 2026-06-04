@@ -6,10 +6,10 @@ const identifyUser = require("../middlewares/auth.middleware");
 
 const userController = require("../controllers/user.controller");
 
-followRouter.post("/follow/:username" , identifyUser , userController.followUSerController );
+followRouter.post("/toggle-follow/:id" , identifyUser , userController.toggleFollowController );
 
 
-followRouter.post("/unfollow/:username" , identifyUser , userController.unfollowUserController);
+
 
 
 followRouter.get("/followers/:username" , identifyUser , userController.getfollowersController);
