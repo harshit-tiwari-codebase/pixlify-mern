@@ -6,6 +6,9 @@ import Login from './features/auth/pages/Login'
 import Register from './features/auth/pages/Register'
 import Feed from './features/post/Pages/Feed'
 import CreatePost from './features/post/Pages/CreatePost'
+import MyProfile from './features/post/Pages/MyProfile'
+import Followers from './features/post/Pages/Followers'
+import Following from './features/post/Pages/Following'
 
 const AppRoutes = () => {
   return (
@@ -15,6 +18,9 @@ const AppRoutes = () => {
           <Route path = "/register" element = {<Register/>} />
           <Route path = "/" element = {<Feed/>} />
           <Route path=  "/createPost" element = {<CreatePost/>}  />
+          <Route path= "/myProfile" element = {<MyProfile/>} />
+          <Route path= "/follower" element = {<Followers/>} />
+          <Route path= "/following" element = {<Following/>} />
        </Routes>
     </BrowserRouter>
   )

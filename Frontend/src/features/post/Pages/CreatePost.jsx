@@ -28,7 +28,7 @@ const CreatePost = () => {
   }
   return (
     <div className="w-full min-h-screen flex justify-center bg-black text-amber-50">
-      <div className="createPost-container w-full max-w-md lg:max-w-4xl xl:max-w-5xl">
+      <div className="createPost-container w-full max-w-md lg:max-w-5xl xl:max-w-5xl">
         {/* Header */}
         <div className="nav w-full h-12 flex items-center justify-between px-4 border-b border-zinc-800">
           <button

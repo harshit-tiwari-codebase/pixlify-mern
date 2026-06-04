@@ -14,6 +14,13 @@ const Post = ({ post , handleToggleLike}) => {
           />
 
           <h2 className="text-sm font-semibold">{post.userId?.username}</h2>
+
+          <button
+          onClick={()=>{
+            console.log(post.userId?._id);
+            
+          }}
+           className="px-2 py-0.5 border border-white rounded text-sm">Follow</button>
         </div>
 
         <button className="text-lg font-bold">•••</button>

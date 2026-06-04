@@ -1,44 +1,64 @@
-import {createContext , useState , useEffect} from 'react';
-
-import { login , register , getMe } from './services/auth.api';
+import { createContext, useState, useEffect } from "react";
+import { login, register, getMe } from "./services/auth.api";
 
 export const authContext = createContext();
 
-export function AuthProvider({children}){
-     const [user, setuser] = useState(null);
-     const [loading, setloading] = useState(false);
+export function AuthProvider({ children }) {
+  const [user, setuser] = useState(null);
+  const [loading, setloading] = useState(false);
 
-     const handleLogin = async (username, password) => {
-        setloading(true);
-        try {
-            const response = await login(username, password);
-            setuser(response.user);
-            return response;
-        } catch (error) {
-            console.error(error);
-            throw error;
-        } finally {
-            setloading(false);
-        }
-     }
+  const handleLogin = async (username, password) => {
+    setloading(true);
 
-     const handleRegister = async (username, email, password) => {
-        setloading(true);
-        try {
-            const response = await register(username, email, password);
-            setuser(response.user);
-            return response;
-        } catch (error) {
-            console.error(error);
-            throw error;
-        } finally {
-             setloading(false);
-        }
-     }
+    try {
+      const response = await login(username, password);
+      setuser(response.user);
+      return response;
+    } catch (error) {
+      throw error;
+    } finally {
+      setloading(false);
+    }
+  };
 
-     return (
-        <authContext.Provider value={{user , loading , handleLogin , handleRegister}}>
-            {children}
-        </authContext.Provider>
-     )
+  const handleRegister = async (username, email, password) => {
+    setloading(true);
+
+    try {
+      const response = await register(username, email, password);
+      setuser(response.user);
+      return response;
+    } catch (error) {
+      throw error;
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const handleGetMe = async () => {
+    try {
+      const response = await getMe();
+      setuser(response);
+    } catch (error) {
+      setuser(null);
+    }
+  };
+
+  useEffect(() => {
+    handleGetMe();
+  }, []);
+
+  return (
+    <authContext.Provider
+      value={{
+        user,
+        loading,
+        handleLogin,
+        handleRegister,
+        handleGetMe,
+      }}
+    >
+      {children}
+    </authContext.Provider>
+  );
 }
