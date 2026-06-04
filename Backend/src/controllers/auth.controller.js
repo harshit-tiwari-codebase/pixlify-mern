@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const userModel = require("../models/user.models");
 const jwt = require("jsonwebtoken");
 const PostModel  =  require("../models/post.models")
+const followModel = require("../models/follow.models")
 
 const AUTH_COOKIE_NAME = "auth-token";
 
@@ -111,6 +112,8 @@ const loginController = async (req, res) => {
     });
  }
 }
+
+
 const getMeController = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -126,11 +129,36 @@ const getMeController = async (req, res) => {
     const posts = await PostModel.find({ userId })
       .select("caption postUrl likesCount createdAt");
 
+    // Followers
+    const followers = await followModel
+      .find({ followee: userId })
+      .populate("follower", "username profile_img");
+
+    // Following
+    const following = await followModel
+      .find({ follower: userId })
+      .populate("followee", "username profile_img");
+
+    const followersList = followers.map(
+      (item) => item.follower
+    );
+
+    const followingList = following.map(
+      (item) => item.followee
+    );
+
     res.status(200).json({
       user: user.username,
       email: user.email,
       bio: user.bio,
       profile: user.profile_img,
+
+      followersCount: followersList.length,
+      followingCount: followingList.length,
+
+      followers: followersList,
+      following: followingList,
+
       posts,
     });
 
@@ -140,6 +168,5 @@ const getMeController = async (req, res) => {
     });
   }
 };
-
 module.exports = {registerController , loginController ,getMeController};
 
