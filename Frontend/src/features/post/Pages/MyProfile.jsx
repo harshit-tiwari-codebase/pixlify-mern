@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import {
@@ -13,9 +13,13 @@ import { Link, useNavigate } from "react-router-dom";
 
 const MyProfile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, handleGetMe } = useAuth();
 
   console.log(user)
+
+  useEffect(() => {
+    handleGetMe();
+  }, []);
 
   if (!user) {
     return <ProfileSkeleton />;

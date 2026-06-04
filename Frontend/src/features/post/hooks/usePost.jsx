@@ -3,9 +3,12 @@ import { useContext } from "react";
 import { PostContext } from "../post.context";
 import { createPost } from "../services/post.api";
 import { toast } from "react-hot-toast";
+import { useAuth } from "../../auth/hooks/useAuth";
+
 
 export const usePost = () => {
   const context = useContext(PostContext);
+  const { handleGetMe } = useAuth();
 
   const {
     loading,
@@ -57,6 +60,7 @@ export const usePost = () => {
     const data = await createPost(caption, image);
 
     toast.success(data.message);
+    await handleGetMe();
 
     return data;
 
@@ -87,6 +91,7 @@ const handleToggleFollow = async (followeeId) => {
     );
 
     toast.success(data.message);
+    await handleGetMe();
 
   } catch (error) {
   console.log(error);
