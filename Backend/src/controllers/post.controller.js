@@ -1,5 +1,6 @@
 const PostModel = require("../models/post.models");
 const likeModel = require("../models/like.model");
+const followModel = require("../models/follow.models");
 const ImageKit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
 const jwt = require("jsonwebtoken");
@@ -186,8 +187,18 @@ async function getFeed(req, res) {
           userId,
         });
 
+        const isFollowing = await followModel.findOne({
+          follower: userId,
+          followee: post.userId._id,
+        });
+
         return {
           ...post,
+          userId: {
+            ...post.userId,
+            isFollowing: !!isFollowing,
+          },
+          isOwnPost: post.userId._id.toString() === userId.toString(),
           isLiked: !!isLiked,
         };
       }),
