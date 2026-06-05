@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router";
@@ -50,6 +49,7 @@ const Login = () => {
         <form onSubmit={loginHandler} className="flex flex-col gap-5">
           <input
             type="text"
+            autoComplete="username"
             onChange={(e) => {
               setusername(e.target.value);
             }}
@@ -59,6 +59,7 @@ const Login = () => {
 
           <input
             type="password"
+            autoComplete="current-password"
             onChange={(e) => {
               setpassword(e.target.value);
             }}

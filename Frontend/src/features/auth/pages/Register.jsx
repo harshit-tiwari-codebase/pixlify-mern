@@ -51,6 +51,7 @@ const Register = () => {
         <form onSubmit={registerHandler} className="flex flex-col gap-5">
           <input
             type="text"
+            autoComplete="email"
             value={email}
             onChange={(e) => {
               setemail(e.target.value);
@@ -62,6 +63,7 @@ const Register = () => {
 
           <input
             type="text"
+            autoComplete="username"
             value={username}
             onChange={(e) => {
               setusername(e.target.value);
@@ -72,6 +74,7 @@ const Register = () => {
 
           <input
             type="password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => {
               setpassword(e.target.value);
