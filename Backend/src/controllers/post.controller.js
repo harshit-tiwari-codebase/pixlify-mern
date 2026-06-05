@@ -193,6 +193,11 @@ async function getFeed(req, res) {
           followee: post.userId._id,
         });
 
+        const isSaved = await saveModel.findOne({
+          userId,
+          postId: post._id,
+        });
+
         return {
           ...post,
           userId: {
@@ -201,6 +206,7 @@ async function getFeed(req, res) {
           },
           isOwnPost: post.userId._id.toString() === userId.toString(),
           isLiked: !!isLiked,
+          isSaved: !!isSaved,
         };
       }),
     );
@@ -235,6 +241,7 @@ async function toggleSavePost (req , res){
 
       return res.status(200).json({
         success: true,
+        saved: false,
         message: "Post unsaved successfully",
       });
     }
@@ -246,6 +253,8 @@ async function toggleSavePost (req , res){
 
     res.status(200).json(
       {
+        success: true,
+        saved: true,
         message : "post saved successfully",
         savedPost
       }
