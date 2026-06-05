@@ -21,6 +21,16 @@ export async function toggleLike(postId) {
     return response.data;
 }
 
+export async function toggleSavePost(postId) {
+    const response = await api.post(`/save/${postId}`);
+    return response.data;
+}
+
+export async function getSavedPosts() {
+    const response = await api.get("/getSaved");
+    return response.data;
+}
+
 
 export async function createPost(caption, image) {
   const formData = new FormData();

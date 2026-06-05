@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import ProfileSkeleton from "../components/ProfileSkeleton";
+import { usePost } from "../hooks/usePost";
 import {
   Grid3X3,
   Bookmark,
@@ -14,12 +15,32 @@ import { Link, useNavigate } from "react-router-dom";
 const MyProfile = () => {
   const navigate = useNavigate();
   const { user, handleGetMe } = useAuth();
+  const { handleGetSavedPosts } = usePost();
+  const [activeTab, setActiveTab] = useState("posts");
+  const [savedPosts, setSavedPosts] = useState([]);
+  const [savedLoading, setSavedLoading] = useState(false);
 
   console.log(user)
 
   useEffect(() => {
     handleGetMe();
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "saved") return;
+
+    async function loadSavedPosts() {
+      try {
+        setSavedLoading(true);
+        const posts = await handleGetSavedPosts();
+        setSavedPosts(posts);
+      } finally {
+        setSavedLoading(false);
+      }
+    }
+
+    loadSavedPosts();
+  }, [activeTab]);
 
   if (!user) {
     return <ProfileSkeleton />;
@@ -108,12 +129,26 @@ const MyProfile = () => {
         {/* Tabs */}
         <div className="border-t border-zinc-800">
           <div className="flex">
-            <button className="flex-1 flex items-center justify-center gap-2 py-3 border-t-2 border-white">
+            <button
+              onClick={() => setActiveTab("posts")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 ${
+                activeTab === "posts"
+                  ? "border-t-2 border-white text-white"
+                  : "text-zinc-500"
+              }`}
+            >
               <Grid3X3 size={18} />
               <span className="hidden sm:block">Posts</span>
             </button>
 
-            <button className="flex-1 flex items-center justify-center gap-2 py-3 text-zinc-500">
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 ${
+                activeTab === "saved"
+                  ? "border-t-2 border-white text-white"
+                  : "text-zinc-500"
+              }`}
+            >
               <Bookmark size={18} />
               <span className="hidden sm:block">Saved</span>
             </button>
@@ -122,7 +157,7 @@ const MyProfile = () => {
 
         {/* Posts */}
         <div className="grid grid-cols-3 gap-1 mt-8">
-          {user?.posts?.map((post) => (
+          {(activeTab === "posts" ? user?.posts : savedPosts)?.map((post) => (
             <div
               key={post._id}
               className="group relative aspect-square overflow-hidden bg-zinc-900 cursor-pointer"
@@ -150,6 +185,14 @@ const MyProfile = () => {
             </div>
           ))}
         </div>
+
+        {activeTab === "saved" && savedLoading && (
+          <p className="text-center text-zinc-500 mt-8">Loading saved posts...</p>
+        )}
+
+        {activeTab === "saved" && !savedLoading && savedPosts.length === 0 && (
+          <p className="text-center text-zinc-500 mt-8">No saved posts yet.</p>
+        )}
       </div>
     </div>
   );

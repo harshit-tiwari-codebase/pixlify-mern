@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import Navbar from "../components/Navbar";
 
 const Feed = () => {
-  const { feed, handleGetFeed, loading, handleToggleLike ,handleToggleFollow } = usePost();
+  const { feed, handleGetFeed, loading, handleToggleLike ,handleToggleFollow, handleToggleSave } = usePost();
 
   useEffect(() => {
     handleGetFeed();
@@ -33,6 +33,7 @@ const Feed = () => {
                 post={post}
                 handleToggleLike={handleToggleLike}
                 handleToggleFollow={handleToggleFollow}
+                handleToggleSave={handleToggleSave}
               />
             ))
           )}

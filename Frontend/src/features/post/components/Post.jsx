@@ -1,7 +1,7 @@
 import React from "react";
 import { Heart, MessageCircle, Send, Bookmark } from "lucide-react";
 
-const Post = ({ post, handleToggleLike , handleToggleFollow }) => {
+const Post = ({ post, handleToggleLike , handleToggleFollow, handleToggleSave }) => {
   return (
     <div className="bg-black text-white border border-zinc-800 rounded-md overflow-hidden">
       {/* Header */}
@@ -55,7 +55,12 @@ const Post = ({ post, handleToggleLike , handleToggleFollow }) => {
             <Send className="w-6 h-6 cursor-pointer hover:scale-110 transition" />
           </div>
 
-          <Bookmark className="w-6 h-6 cursor-pointer hover:scale-110 transition" />
+          <Bookmark
+            onClick={() => handleToggleSave(post._id)}
+            className={`w-6 h-6 cursor-pointer hover:scale-110 transition ${
+              post.isSaved ? "fill-white text-white" : "text-white"
+            }`}
+          />
         </div>
 
         {/* Likes */}
