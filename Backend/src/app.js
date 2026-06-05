@@ -23,7 +23,7 @@ app.use((req, res, next) => {
       "script-src 'self'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "img-src 'self' data: blob:",
+      "img-src 'self' data: blob: https:",
       "connect-src 'self' http://localhost:3000 http://localhost:5173 https://pixlify-mern-1.onrender.com",
     ].join("; ")
   );
