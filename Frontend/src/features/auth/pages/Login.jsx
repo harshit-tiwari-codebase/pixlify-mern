@@ -21,7 +21,7 @@ const Login = () => {
 
       toast.success("Welcome to pixlify");
       setTimeout(() => {
-        navigate("/");
+        navigate("/feed");
       }, 1000);
       console.log(response);
     } catch (error) {

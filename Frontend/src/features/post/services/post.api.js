@@ -1,12 +1,12 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL:"http://localhost:3000/api/posts",
+    baseURL:"https://pixlify-mern-1.onrender.com/api/posts",
     withCredentials : true
 })
 
 const userApi = axios.create({
-    baseURL:"http://localhost:3000/api/user",
+    baseURL:"https://pixlify-mern-1.onrender.com/api/user",
     withCredentials : true
 })
 

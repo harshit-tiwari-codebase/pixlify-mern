@@ -14,9 +14,10 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
        <Routes>
+          <Route path = "/" element = {<Register/>} />
           <Route path = "/login" element = {<Login/>} />
           <Route path = "/register" element = {<Register/>} />
-          <Route path = "/" element = {<Feed/>} />
+          <Route path = "/feed" element = {<Feed/>} />
           <Route path=  "/createPost" element = {<CreatePost/>}  />
           <Route path= "/myProfile" element = {<MyProfile/>} />
           <Route path= "/follower" element = {<Followers/>} />

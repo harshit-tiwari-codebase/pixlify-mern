@@ -21,7 +21,7 @@ const CreatePost = () => {
       setCaption("");
       setimage(null);
 
-      navigate("/");
+      navigate("/feed");
     } finally {
       setLoading(false);
     }
