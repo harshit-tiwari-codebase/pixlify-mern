@@ -1,6 +1,7 @@
 const PostModel = require("../models/post.models");
 const likeModel = require("../models/like.model");
 const followModel = require("../models/follow.models");
+const saveModel = require("../models/save.model");
 const ImageKit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
 const jwt = require("jsonwebtoken");
@@ -217,6 +218,80 @@ async function getFeed(req, res) {
   }
 }
 
+async function toggleSavePost (req , res){
+
+  try {
+    
+    const postId = req.params.postId;
+    const userId = req.user.id;
+
+     const existingSave = await saveModel.findOne({
+      userId,
+      postId,
+    }); 
+
+    if(existingSave){
+      await saveModel.findByIdAndDelete(existingSave._id);
+
+      return res.status(200).json({
+        success: true,
+        message: "Post unsaved successfully",
+      });
+    }
+
+    const savedPost = await saveModel.create({
+      userId : userId,
+      postId : postId
+    })
+
+    res.status(200).json(
+      {
+        message : "post saved successfully",
+        savedPost
+      }
+    )
+    
+    
+
+
+
+
+
+
+
+
+
+
+  } 
+  
+  
+  catch (error) {
+    return res.status(500).json({
+      message : error.message
+    })
+  }
+
+}
+
+async function getSavedPosts(req, res) {
+  try {
+    const savedPosts = await saveModel
+      .find({ userId: req.user.id })
+      .populate({
+        path: "postId",
+        populate: {
+          path: "userId",
+        },
+      });
+
+    res.status(200).json(savedPosts);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
 
 module.exports = {
   PostCreate,
@@ -224,4 +299,6 @@ module.exports = {
   GetPostDets,
   toggleLike,
   getFeed,
+  toggleSavePost,
+  getSavedPosts
 };
