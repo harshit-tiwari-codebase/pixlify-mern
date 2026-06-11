@@ -2,6 +2,12 @@ const { default: mongoose } = require("mongoose");
 const followModel = require("../models/follow.models");
 const PostModel = require("../models/post.models");
 const userModel = require("../models/user.models");
+const ImageKit = require("@imagekit/nodejs");
+const { toFile } = require("@imagekit/nodejs");
+
+const imagekit = new ImageKit({
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+});
 
 /**
  * 
@@ -170,7 +176,7 @@ async function getUserProfile(req, res) {
 async function editProfile(req ,res){
   try {
     const userId = req.user.id;
-    const { bio, profile_img, username, email, password } = req.body;
+    const { bio, username, email, password, profile_img } = req.body;
 
     const currentUser = await userModel.findById(userId);
 
@@ -192,7 +198,15 @@ async function editProfile(req ,res){
       updates.bio = bio;
     }
 
-    if (profile_img !== undefined) {
+    if (req.file) {
+      const uploadedFile = await imagekit.files.upload({
+        file: await toFile(req.file.buffer, req.file.originalname),
+        fileName: req.file.originalname,
+        folder: "pixlifyProfile",
+      });
+
+      updates.profile_img = uploadedFile.url;
+    } else if (profile_img !== undefined) {
       updates.profile_img = profile_img;
     }
 
