@@ -22,14 +22,23 @@ const MyProfile = () => {
   const [savedLoading, setSavedLoading] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [bio, setBio] = useState("");
-  const [profileImg, setProfileImg] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
+  const [profilePreview, setProfilePreview] = useState("");
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (profilePreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(profilePreview);
+      }
+    };
+  }, [profilePreview]);
 
   useEffect(() => {
     if (!user) return;
 
     setBio(user.bio || "");
-    setProfileImg(user.profile || "");
+    setProfilePreview(user.profile || "");
   }, [user]);
 
   useEffect(() => {
@@ -39,7 +48,7 @@ const MyProfile = () => {
   async function handleSaveProfile() {
     try {
       setSaving(true);
-      await editProfile(bio, profileImg);
+      await editProfile(bio, profileImage);
       await handleGetMe();
       setIsEditOpen(false);
     } finally {
@@ -234,13 +243,30 @@ const MyProfile = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-zinc-400 mb-2">Profile Image URL</label>
+                <label className="block text-sm text-zinc-400 mb-2">
+                  Profile Image
+                </label>
                 <input
-                  value={profileImg}
-                  onChange={(e) => setProfileImg(e.target.value)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setProfileImage(file);
+
+                    if (file) {
+                      setProfilePreview(URL.createObjectURL(file));
+                    }
+                  }}
                   className="w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2 outline-none focus:border-white"
-                  placeholder="https://..."
                 />
+
+                {profilePreview && (
+                  <img
+                    src={profilePreview}
+                    alt="Profile preview"
+                    className="mt-3 w-20 h-20 rounded-full object-cover border border-zinc-700"
+                  />
+                )}
               </div>
 
               <div>

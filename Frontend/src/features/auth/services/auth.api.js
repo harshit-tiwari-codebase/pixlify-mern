@@ -1,6 +1,7 @@
 import axios from "axios";
 const api = axios.create ({
     baseURL : "https://pixlify-mern-1.onrender.com/api/auth",
+    // baseURL  : "http://localhost:3000/api/auth",
     withCredentials:true
 })
 
@@ -38,12 +39,16 @@ export async function getMe(){
     }
 }
 
-export async function editProfile(bio, profile_img) {
+export async function editProfile(bio, profileImage) {
     try {
-        const response = await api.put("/editProfile", {
-            bio,
-            profile_img,
-        });
+        const formData = new FormData();
+        formData.append("bio", bio);
+
+        if (profileImage) {
+            formData.append("profileImage", profileImage);
+        }
+
+        const response = await api.put("/editProfile", formData);
         return response.data;
     } catch (error) {
         throw error;
