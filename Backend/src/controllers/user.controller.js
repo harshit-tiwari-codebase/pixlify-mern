@@ -167,9 +167,66 @@ async function getUserProfile(req, res) {
   const { username } = req.params;
 }
 
+async function editProfile(req ,res){
+  try {
+    const userId = req.user.id;
+    const { bio, profile_img, username, email, password } = req.body;
+
+    const currentUser = await userModel.findById(userId);
+
+    if (!currentUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (username !== undefined || email !== undefined || password !== undefined) {
+      return res.status(400).json({
+        message: "You can only edit bio and profile image",
+      });
+    }
+
+    const updates = {};
+
+    if (bio !== undefined) {
+      updates.bio = bio;
+    }
+
+    if (profile_img !== undefined) {
+      updates.profile_img = profile_img;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        message: "Please provide bio or profile image to update",
+      });
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        user: updatedUser.username,
+        email: updatedUser.email,
+        bio: updatedUser.bio,
+        profile: updatedUser.profile_img,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   toggleFollowController,
   getFollowersController,
   getFollowingController,
   getUserProfile,
+  editProfile
 };

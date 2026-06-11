@@ -42,6 +42,7 @@ connectToDb();
 const authRouter = require("./routes/auth.routes");
 const followRouter = require("./routes/user.routes");
 const postRouter = require("./routes/post.routes");
+const commentRouter = require("./routes/comment.routes");
 
 /**
  * using routes
@@ -49,6 +50,7 @@ const postRouter = require("./routes/post.routes");
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/user", followRouter);
+app.use("/api/comment",commentRouter);
 
 app.use(express.static(path.join(__dirname, "../public")));
 
