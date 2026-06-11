@@ -37,3 +37,15 @@ export async function getMe(){
         throw error
     }
 }
+
+export async function editProfile(bio, profile_img) {
+    try {
+        const response = await api.put("/editProfile", {
+            bio,
+            profile_img,
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

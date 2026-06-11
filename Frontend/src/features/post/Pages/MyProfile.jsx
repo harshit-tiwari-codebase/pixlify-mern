@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../auth/hooks/useAuth";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import { usePost } from "../hooks/usePost";
+import { editProfile } from "../../auth/services/auth.api";
 import {
   Grid3X3,
   Bookmark,
@@ -19,12 +20,32 @@ const MyProfile = () => {
   const [activeTab, setActiveTab] = useState("posts");
   const [savedPosts, setSavedPosts] = useState([]);
   const [savedLoading, setSavedLoading] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [bio, setBio] = useState("");
+  const [profileImg, setProfileImg] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  console.log(user)
+  useEffect(() => {
+    if (!user) return;
+
+    setBio(user.bio || "");
+    setProfileImg(user.profile || "");
+  }, [user]);
 
   useEffect(() => {
     handleGetMe();
   }, []);
+
+  async function handleSaveProfile() {
+    try {
+      setSaving(true);
+      await editProfile(bio, profileImg);
+      await handleGetMe();
+      setIsEditOpen(false);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     if (activeTab !== "saved") return;
@@ -107,7 +128,10 @@ const MyProfile = () => {
               </div>
 
               <div className="flex gap-2 mt-5">
-                <button className="flex-1 bg-zinc-900 border border-zinc-700 py-2 rounded-lg flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setIsEditOpen(true)}
+                  className="flex-1 bg-zinc-900 border border-zinc-700 py-2 rounded-lg flex items-center justify-center gap-2"
+                >
                   <UserRoundPen size={18} />
                   Edit Profile
                 </button>
@@ -194,6 +218,61 @@ const MyProfile = () => {
           <p className="text-center text-zinc-500 mt-8">No saved posts yet.</p>
         )}
       </div>
+
+      {isEditOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Edit Profile</h2>
+              <button
+                onClick={() => setIsEditOpen(false)}
+                className="text-zinc-400 hover:text-white"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Profile Image URL</label>
+                <input
+                  value={profileImg}
+                  onChange={(e) => setProfileImg(e.target.value)}
+                  className="w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2 outline-none focus:border-white"
+                  placeholder="https://..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full min-h-32 rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-2 outline-none focus:border-white resize-none"
+                  placeholder="Write a short bio..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsEditOpen(false)}
+                  className="flex-1 rounded-lg border border-zinc-700 py-2 text-zinc-300"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={saving}
+                  className="flex-1 rounded-lg bg-white text-black py-2 font-medium disabled:opacity-60"
+                >
+                  {saving ? "Saving..." : "Save changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
