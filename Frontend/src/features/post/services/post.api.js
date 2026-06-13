@@ -7,8 +7,8 @@ const api = axios.create({
 })
 
 const userApi = axios.create({
-    // baseURL:"https://pixlify-mern-1.onrender.com/api/user",
-     baseURL  : "http://localhost:3000/api/user",
+    baseURL:"https://pixlify-mern-1.onrender.com/api/user",
+    //  baseURL  : "http://localhost:3000/api/user",
     withCredentials : true
 })
 
