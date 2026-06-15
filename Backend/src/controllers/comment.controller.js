@@ -27,11 +27,14 @@ async function createComment(req, res) {
       userId,
     });
 
+    const populatedComment = await commentModel
+      .findById(newComment._id)
+      .populate("userId", "username profile_img");
+
     return res.status(201).json({
       message: "Comment created successfully",
-      comment: newComment,
+      comment: populatedComment,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -41,27 +44,19 @@ async function createComment(req, res) {
   }
 }
 
-async function getComments (req , res){
-     try {
+async function getComments(req, res) {
+  try {
     const { postId } = req.params;
-    
 
-   
-
-  
- const response = await commentModel
-  .find({ postId })
-  .populate("userId", "username profile_img")
-  .sort({ createdAt: -1 });
-    
-
-    
+    const response = await commentModel
+      .find({ postId })
+      .populate("userId", "username profile_img")
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: "Comments fetched successfully",
-       response
+      comments: response,
     });
-
   } catch (error) {
     console.error(error);
 
@@ -71,4 +66,4 @@ async function getComments (req , res){
   }
 }
 
-module.exports = { createComment , getComments };
+module.exports = { createComment, getComments };
