@@ -5,7 +5,6 @@ import { createPost } from "../services/post.api";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../auth/hooks/useAuth";
 
-
 export const usePost = () => {
   const context = useContext(PostContext);
   const { handleGetMe } = useAuth();
@@ -128,6 +127,8 @@ const handleToggleFollow = async (followeeId) => {
   );
 }
 };
+
+
 
   return {
     loading,

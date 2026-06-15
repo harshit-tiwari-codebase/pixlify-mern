@@ -1,17 +1,21 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL:"https://pixlify-mern-1.onrender.com/api/posts",
-    //  baseURL  : "http://localhost:3000/api/posts",
+    // baseURL:"https://pixlify-mern-1.onrender.com/api/posts",
+     baseURL  : "http://localhost:3000/api/posts",
     withCredentials : true
 })
 
 const userApi = axios.create({
-    baseURL:"https://pixlify-mern-1.onrender.com/api/user",
-    //  baseURL  : "http://localhost:3000/api/user",
+    // baseURL:"https://pixlify-mern-1.onrender.com/api/user",
+     baseURL  : "http://localhost:3000/api/user",
     withCredentials : true
 })
 
+const commentApi = axios.create({
+  baseURL : "http://localhost:3000/api/comment",
+  withCredentials:true
+})
 
 export async function getFeed() {
     const response = await api.get("/getfeed");
@@ -57,3 +61,19 @@ export const toggleFollowApi = async (userId) => {
   const response = await userApi.post(`/toggle-follow/${userId}`);
   return response.data;
 };
+
+export async function createComment(postId, comment) {
+  const response = await commentApi.post(
+    `/create/${postId}`,
+    {
+      comment,
+    }
+  );
+
+  return response.data;
+}
+
+export async function getComments(postId) {
+  const response = await commentApi.get(`/get-comments/${postId}`);
+  return response.data;
+}
