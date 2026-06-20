@@ -1,19 +1,20 @@
 import axios from "axios";
 
 const api = axios.create({
-    // baseURL:"https://pixlify-mern-1.onrender.com/api/posts",
-     baseURL  : "http://localhost:3000/api/posts",
+    baseURL:"https://pixlify-mern-1.onrender.com/api/posts",
+    //  baseURL  : "http://localhost:3000/api/posts",
     withCredentials : true
 })
 
 const userApi = axios.create({
-    // baseURL:"https://pixlify-mern-1.onrender.com/api/user",
-     baseURL  : "http://localhost:3000/api/user",
+    baseURL:"https://pixlify-mern-1.onrender.com/api/user",
+    //  baseURL  : "http://localhost:3000/api/user",
     withCredentials : true
 })
 
 const commentApi = axios.create({
-  baseURL : "http://localhost:3000/api/comment",
+  baseURL:"https://pixlify-mern-1.onrender.com/api/comment",
+  // baseURL : "http://localhost:3000/api/comment",
   withCredentials:true
 })
 
