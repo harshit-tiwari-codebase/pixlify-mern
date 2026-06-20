@@ -1,6 +1,20 @@
 const commentModel = require("../models/comments.models");
 const postModel = require("../models/post.models");
 
+/**
+ * @route POST /api/comments/:postId
+ * @desc Create a comment on a post
+ * @access Private
+ *
+ * @param {string} postId - MongoDB Post ID
+ *
+ * @body
+ * {
+ *   "comment": "This is an awesome post!"
+ * }
+ *
+ * @returns {Object} Newly created comment with user details
+ */
 async function createComment(req, res) {
   try {
     const { postId } = req.params;
@@ -44,6 +58,15 @@ async function createComment(req, res) {
   }
 }
 
+/**
+ * @route GET /api/comments/:postId
+ * @desc Get all comments of a specific post
+ * @access Public
+ *
+ * @param {string} postId - MongoDB Post ID
+ *
+ * @returns {Array} List of comments with user details
+ */
 async function getComments(req, res) {
   try {
     const { postId } = req.params;
@@ -66,4 +89,7 @@ async function getComments(req, res) {
   }
 }
 
-module.exports = { createComment, getComments };
+module.exports = {
+  createComment,
+  getComments,
+};

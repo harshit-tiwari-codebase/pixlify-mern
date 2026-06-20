@@ -14,7 +14,18 @@ const imagekit = new ImageKit({
 });
 
 /**
- * Create a new post
+ * @route POST /api/posts/create
+ * @desc Create a new post with image upload
+ * @access Private
+ *
+ * @body
+ * FormData:
+ * {
+ *   "caption": "My first Pixlify post",
+ *   "image": File
+ * }
+ *
+ * @returns {Object} Created post details
  */
 async function PostCreate(req, res) {
   try {
@@ -71,6 +82,13 @@ async function PostCreate(req, res) {
   }
 }
 
+/**
+ * @route GET /api/posts/my-posts
+ * @desc Get all posts created by the logged-in user
+ * @access Private
+ *
+ * @returns {Array} User posts
+ */
 async function GetPost(req, res) {
   const user = req.user.id;
 
@@ -89,6 +107,15 @@ async function GetPost(req, res) {
   });
 }
 
+/**
+ * @route GET /api/posts/details/:postId
+ * @desc Get a specific post by ID
+ * @access Private
+ *
+ * @param {string} postId - MongoDB Post ID
+ *
+ * @returns {Object} Post details
+ */
 async function GetPostDets(req, res) {
   try {
     const userId = req.user.id;
@@ -120,6 +147,21 @@ async function GetPostDets(req, res) {
     });
   }
 }
+
+/**
+ * @route POST /api/posts/toggle-like/:postId
+ * @desc Like or unlike a post
+ * @access Private
+ *
+ * @param {string} postId - MongoDB Post ID
+ *
+ * @returns {Object}
+ * {
+ *   success: true,
+ *   liked: boolean,
+ *   message: string
+ * }
+ */
 async function toggleLike(req, res) {
   try {
 
@@ -177,6 +219,19 @@ async function toggleLike(req, res) {
   });
 }
 }
+
+/**
+ * @route GET /api/posts/getfeed
+ * @desc Get feed posts with like, follow, save, and ownership status
+ * @access Private
+ *
+ * @returns {Array}
+ * Posts enriched with:
+ * - isLiked
+ * - isSaved
+ * - isOwnPost
+ * - userId.isFollowing
+ */
 async function getFeed(req, res) {
   try {
     const userId = req.user.id;
@@ -224,6 +279,20 @@ async function getFeed(req, res) {
   }
 }
 
+/**
+ * @route POST /api/posts/toggle-save/:postId
+ * @desc Save or unsave a post
+ * @access Private
+ *
+ * @param {string} postId - MongoDB Post ID
+ *
+ * @returns {Object}
+ * {
+ *   success: true,
+ *   saved: boolean,
+ *   message: string
+ * }
+ */
 async function toggleSavePost (req , res){
 
   try {
@@ -282,6 +351,16 @@ async function toggleSavePost (req , res){
 
 }
 
+/**
+ * @route GET /api/posts/saved
+ * @desc Get all saved posts of the logged-in user
+ * @access Private
+ *
+ * @returns {Array}
+ * Saved posts with:
+ * - post details
+ * - post creator details
+ */
 async function getSavedPosts(req, res) {
   try {
     const savedPosts = await saveModel

@@ -1,3 +1,20 @@
+/**
+ * ============================================
+ * Pixlify User Controller
+ * ============================================
+ * Handles:
+ * - Follow / Unfollow Users
+ * - Followers List
+ * - Following List
+ * - User Profiles
+ * - Profile Editing
+ * - Profile Image Uploads
+ *
+ * Author: Harshit Tiwari
+ * Project: Pixlify
+ * ============================================
+ */
+
 const { default: mongoose } = require("mongoose");
 const followModel = require("../models/follow.models");
 const PostModel = require("../models/post.models");
@@ -9,23 +26,22 @@ const imagekit = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
 });
 
+
+
+
 /**
- * 
-const followSchema = mongoose.Schema({
-  followers: {
-    types: mongoose.Schema.Types.ObjectId,
-    ref: "pixlify-user",
-    required : [true , "Follower is required"]
-  },
-  followee: {
-    types: mongoose.Schema.Types.ObjectId,
-    ref: "pixlify-user",
-     required : [true , "Followee is required"]
-  },
-} , {timestamps : true } );
-
+ * @route POST /api/user/follow/:id
+ * @desc Follow or unfollow a user
+ * @access Private
+ *
+ * @param {string} id - User ID of the target user
+ *
+ * @returns {Object}
+ * {
+ *   isFollowing: boolean,
+ *   message: string
+ * }
  */
-
 async function toggleFollowController(req, res) {
   try {
     
@@ -79,6 +95,26 @@ async function toggleFollowController(req, res) {
   }
 }
 
+/**
+ * @route GET /api/user/following/:id
+ * @desc Get all users followed by a specific user
+ * @access Private
+ *
+ * @param {string} id - User ID
+ *
+ * @returns {Object}
+ * {
+ *   count: number,
+ *   following: [
+ *     {
+ *       _id: string,
+ *       username: string,
+ *       profile_img: string,
+ *       isFollowing: boolean
+ *     }
+ *   ]
+ * }
+ */
 async function getFollowingController(req, res) {
   try {
     const { id } = req.params;
@@ -124,6 +160,27 @@ async function getFollowingController(req, res) {
   }
 }
 
+
+/**
+ * @route GET /api/user/followers/:id
+ * @desc Get all followers of a specific user
+ * @access Private
+ *
+ * @param {string} id - User ID
+ *
+ * @returns {Object}
+ * {
+ *   count: number,
+ *   followers: [
+ *     {
+ *       _id: string,
+ *       username: string,
+ *       profile_img: string,
+ *       isFollowing: boolean
+ *     }
+ *   ]
+ * }
+ */
 async function getFollowersController(req, res) {
   try {
     const { id } = req.params;
@@ -169,10 +226,49 @@ async function getFollowersController(req, res) {
   }
 }
 
+/**
+ * @route GET /api/user/profile/:username
+ * @desc Get public profile information by username
+ * @access Public
+ *
+ * @param {string} username - Username of the user
+ *
+ * @returns {Object}
+ * User profile information
+ */
 async function getUserProfile(req, res) {
   const { username } = req.params;
 }
 
+/**
+ * @route PUT /api/user/edit-profile
+ * @desc Update logged-in user's profile
+ * @access Private
+ *
+ * @body
+ * FormData:
+ * {
+ *   "bio": "Full Stack Developer",
+ *   "profile_img": File
+ * }
+ *
+ * Notes:
+ * - Username cannot be changed
+ * - Email cannot be changed
+ * - Password cannot be changed
+ * - Only bio and profile image are editable
+ *
+ * @returns {Object}
+ * {
+ *   message: string,
+ *   user: {
+ *     username: string,
+ *     email: string,
+ *     bio: string,
+ *     profile: string
+ *   }
+ * }
+ */
 async function editProfile(req ,res){
   try {
     const userId = req.user.id;

@@ -1,7 +1,19 @@
 const ChallengeModel = require("../models/createChallange.models");
 
 /**
- * Create Challenge
+ * @route POST /api/challenge/create
+ * @desc Create a new challenge
+ * @access Private
+ *
+ * @body
+ * {
+ *   "title": "30 Days DSA Challenge",
+ *   "description": "Solve 2 DSA problems daily",
+ *   "startDate": "2026-06-20",
+ *   "endDate": "2026-07-20"
+ * }
+ *
+ * @returns {Object} Newly created challenge
  */
 const createChallenge = async (req, res) => {
   try {
@@ -13,7 +25,7 @@ const createChallenge = async (req, res) => {
       startDate,
       endDate,
       createdBy: req.user.id,
-      participants: [req.user.id], // creator joins automatically
+      participants: [req.user.id],
     });
 
     res.status(201).json({
@@ -32,7 +44,11 @@ const createChallenge = async (req, res) => {
 };
 
 /**
- * Get All Challenges
+ * @route GET /api/challenge
+ * @desc Get all challenges
+ * @access Public
+ *
+ * @returns {Array} List of all challenges sorted by newest first
  */
 const getAllChallenges = async (req, res) => {
   try {
@@ -55,7 +71,13 @@ const getAllChallenges = async (req, res) => {
 };
 
 /**
- * Get Challenge By Id
+ * @route GET /api/challenge/:challengeId
+ * @desc Get challenge details by ID
+ * @access Public
+ *
+ * @param {string} challengeId - MongoDB Challenge ID
+ *
+ * @returns {Object} Challenge details with creator and participants
  */
 const getChallengeById = async (req, res) => {
   try {
@@ -87,7 +109,13 @@ const getChallengeById = async (req, res) => {
 };
 
 /**
- * Join Challenge
+ * @route POST /api/challenge/join/:challengeId
+ * @desc Join an existing challenge
+ * @access Private
+ *
+ * @param {string} challengeId - MongoDB Challenge ID
+ *
+ * @returns {Object} Success message
  */
 const joinChallenge = async (req, res) => {
   try {
@@ -130,7 +158,13 @@ const joinChallenge = async (req, res) => {
 };
 
 /**
- * Leave Challenge
+ * @route POST /api/challenge/leave/:challengeId
+ * @desc Leave a joined challenge
+ * @access Private
+ *
+ * @param {string} challengeId - MongoDB Challenge ID
+ *
+ * @returns {Object} Success message
  */
 const leaveChallenge = async (req, res) => {
   try {
