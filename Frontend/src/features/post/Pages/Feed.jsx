@@ -1,14 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Post from "../components/Post";
 import PostSkeleton from "../components/PostSkeleton";
+import Navbar from "../components/Navbar"
+import BottomNavbar from "../components/BottomNavbar";
 import { usePost } from "../hooks/usePost";
-import { useEffect } from "react";
-
-
-import Navbar from "../components/Navbar";
 
 const Feed = () => {
-  const { feed, handleGetFeed, loading, handleToggleLike ,handleToggleFollow, handleToggleSave } = usePost();
+  const {
+    feed,
+    handleGetFeed,
+    loading,
+    handleToggleLike,
+    handleToggleFollow,
+    handleToggleSave,
+  } = usePost();
 
   useEffect(() => {
     handleGetFeed();
@@ -19,7 +24,7 @@ const Feed = () => {
       <div className="w-full max-w-md lg:max-w-3xl">
         <Navbar />
 
-        <div className="flex flex-col gap-5 px-2">
+        <div className="flex flex-col gap-5 px-2 pb-20">
           {loading ? (
             <>
               <PostSkeleton />
@@ -39,6 +44,8 @@ const Feed = () => {
           )}
         </div>
       </div>
+
+      <BottomNavbar />
     </div>
   );
 };
