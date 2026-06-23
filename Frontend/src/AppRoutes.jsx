@@ -23,7 +23,8 @@ const AppRoutes = () => {
         <Route path="/myProfile" element={<MyProfile />} />
         <Route path="/follower" element={<Followers />} />
         <Route path="/following" element={<Following />} />
-
+        <Route path="/challangeFeed" element={<ChallengeFeed/>} />
+        
       </Routes>
     </BrowserRouter>
   );

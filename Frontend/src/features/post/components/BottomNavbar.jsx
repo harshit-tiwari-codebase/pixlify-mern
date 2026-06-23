@@ -18,7 +18,7 @@ const BottomNavbar = () => {
     },
     {
       icon: Trophy,
-      path: "/challenges",
+      path: "/challangeFeed",
       label: "Challenges",
     },
     {
