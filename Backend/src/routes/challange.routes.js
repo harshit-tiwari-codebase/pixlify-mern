@@ -1,18 +1,25 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
+
 const identifyUser = require("../middlewares/auth.middleware");
 
 const {
   createChallenge,
-  getAllChallenges,
+  getMyChallenges,
   getChallengeById,
-  joinChallenge,
-  leaveChallenge,
+  deleteChallenge,
 } = require("../controllers/challange.controller");
 
+// Create a challenge
 router.post("/create", identifyUser, createChallenge);
-router.get("/", getAllChallenges);
-router.get("/:challengeId", getChallengeById);
-router.post("/join/:challengeId", identifyUser, joinChallenge);
-router.post("/leave/:challengeId", identifyUser, leaveChallenge);
+
+// Get logged-in user's challenges
+router.get("/my", identifyUser, getMyChallenges);
+
+// Get challenge details
+router.get("/:challengeId", identifyUser, getChallengeById);
+
+// Delete challenge
+router.delete("/:challengeId", identifyUser, deleteChallenge);
 
 module.exports = router;
