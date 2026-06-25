@@ -2,16 +2,29 @@ const mongoose = require("mongoose");
 
 const challengeSchema = new mongoose.Schema(
   {
-    title: {
+    category: {
       type: String,
+      enum: [
+        "coding",
+        "leetcode",
+        "development",
+        "gym",
+        "reading",
+        "fitness",
+        "custom",
+      ],
       required: true,
+    },
+    customCategory: {
+      type: String,
       trim: true,
-      maxlength: 100,
+      default: "",
     },
 
     description: {
       type: String,
       required: true,
+      trim: true,
       maxlength: 1000,
     },
 
@@ -20,10 +33,11 @@ const challengeSchema = new mongoose.Schema(
       ref: "pixlify-user",
       required: true,
     },
-    
+
     duration: {
       type: Number,
-      required: true, // e.g. 30, 60, 100
+      required: true,
+      min: 1,
     },
 
     startDate: {
@@ -36,19 +50,6 @@ const challengeSchema = new mongoose.Schema(
       required: true,
     },
 
-    category: {
-      type: String,
-      enum: [
-        "DSA",
-        "Development",
-        "Fitness",
-        "Reading",
-        "Coding",
-        "Custom",
-      ],
-      default: "Custom",
-    },
-
     visibility: {
       type: String,
       enum: ["public", "private"],
@@ -57,18 +58,17 @@ const challengeSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["upcoming", "active", "completed", "cancelled"],
-      default: "upcoming",
-    },
-
-    bannerImage: {
-      type: String,
-      default: "",
+      enum: ["active", "completed", "cancelled"],
+      default: "active",
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
+
+// Helpful indexes
+challengeSchema.index({ createdBy: 1, category: 1, status: 1 });
+challengeSchema.index({ createdBy: 1 });
 
 module.exports = mongoose.model("pixlify-challenge", challengeSchema);

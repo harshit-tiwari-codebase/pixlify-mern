@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const identifyUser = require("../middlewares/auth.middleware");
+const upload = require("../middlewares/multer.middleware");
 
 const {
   createChallenge,
@@ -9,6 +10,9 @@ const {
   getChallengeById,
   deleteChallenge,
 } = require("../controllers/challange.controller");
+
+const checkIn = require("../controllers/checkin.controller");
+
 
 // Create a challenge
 router.post("/create", identifyUser, createChallenge);
@@ -21,5 +25,13 @@ router.get("/:challengeId", identifyUser, getChallengeById);
 
 // Delete challenge
 router.delete("/:challengeId", identifyUser, deleteChallenge);
+
+// Daily challenge check-in
+router.post(
+  "/:challengeId/checkin",
+  identifyUser,
+  upload.single("image"),
+  checkIn
+);
 
 module.exports = router;

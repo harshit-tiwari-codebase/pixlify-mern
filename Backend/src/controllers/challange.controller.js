@@ -5,74 +5,92 @@ const ChallengeProgressModel = require("../models/challangeProgress.models")
  * @route POST /api/challenge/create
  * @desc Create a new personal challenge
  * @access Private
- *
- * @body
- * {
- *   "title": "30 Days DSA Challenge",
- *   "description": "Solve 2 DSA problems daily",
- *   "duration": 30
- * }
  */
 
 const createChallenge = async (req, res) => {
   try {
-    const { title, description, duration } = req.body;
+    const {
+      category,
+      customCategory,
+      description,
+      duration,
+      visibility,
+    } = req.body;
 
-    // 1. Validate input
-    if (!title || !description || !duration) {
+    // Validate required fields
+    if (!category || !description || !duration) {
       return res.status(400).json({
         success: false,
-        message: "Title, description and duration are required.",
+        message: "Category, description and duration are required.",
       });
     }
 
-    // 2. Check if user already has an active challenge
-    const existingChallenge = await ChallengeModel.findOne({
+    // If category is custom, customCategory is required
+    if (category === "custom" && !customCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "Custom category name is required.",
+      });
+    }
+
+    // Duplicate check
+    const query = {
       createdBy: req.user.id,
-      title,
       status: "active",
-    });
+    };
+
+    if (category === "custom") {
+      query.category = "custom";
+      query.customCategory = customCategory.toLowerCase().trim();
+    } else {
+      query.category = category;
+    }
+
+    const existingChallenge = await ChallengeModel.findOne(query);
 
     if (existingChallenge) {
       return res.status(400).json({
         success: false,
-        message: "You already have an active challenge.",
+        message: "You already have an active challenge in this category.",
       });
     }
 
-    // 3. Calculate dates
+    // Dates
     const startDate = new Date();
 
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + Number(duration));
 
-    // 4. Create challenge
+    // Create challenge
     const challenge = await ChallengeModel.create({
-      title,
+      category,
+      customCategory:
+        category === "custom"
+          ? customCategory.toLowerCase().trim()
+          : "",
       description,
       duration,
       startDate,
       endDate,
+      visibility: visibility || "public",
       createdBy: req.user.id,
       status: "active",
     });
 
-    // 5. Return response
     return res.status(201).json({
       success: true,
       message: "Challenge created successfully.",
       challenge,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Create Challenge Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal Server Error.",
     });
   }
 };
-
 
 /**
  * @route GET /api/challenge/my
