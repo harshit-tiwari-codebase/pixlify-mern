@@ -222,36 +222,46 @@ async function toggleLike(req, res) {
 
 /**
  * @route GET /api/posts/getfeed
- * @desc Get feed posts with like, follow, save, and ownership status
+ * @desc Get normal feed posts (excluding challenge posts)
  * @access Private
- *
- * @returns {Array}
- * Posts enriched with:
- * - isLiked
- * - isSaved
- * - isOwnPost
- * - userId.isFollowing
  */
-async function getFeed(req, res) {
+const getFeed = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // Fetch only normal posts
+    const dbPosts = await PostModel.find({
+      isChallengePost: false,
+    })
+      .populate("userId")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    console.log("Normal Feed Count:", dbPosts.length);
+    console.log(
+      dbPosts.map((post) => ({
+        id: post._id,
+        isChallengePost: post.isChallengePost,
+        caption: post.caption,
+      }))
+    );
+
     const posts = await Promise.all(
-      (await PostModel.find().populate("userId").lean()).map(async (post) => {
-        const isLiked = await likeModel.findOne({
-          postId: post._id,
-          userId,
-        });
-
-        const isFollowing = await followModel.findOne({
-          follower: userId,
-          followee: post.userId._id,
-        });
-
-        const isSaved = await saveModel.findOne({
-          userId,
-          postId: post._id,
-        });
+      dbPosts.map(async (post) => {
+        const [isLiked, isFollowing, isSaved] = await Promise.all([
+          likeModel.findOne({
+            postId: post._id,
+            userId,
+          }),
+          followModel.findOne({
+            follower: userId,
+            followee: post.userId._id,
+          }),
+          saveModel.findOne({
+            userId,
+            postId: post._id,
+          }),
+        ]);
 
         return {
           ...post,
@@ -263,22 +273,23 @@ async function getFeed(req, res) {
           isLiked: !!isLiked,
           isSaved: !!isSaved,
         };
-      }),
+      })
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Posts fetched successfully",
       posts,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-}
-
+};
 /**
  * @route POST /api/posts/toggle-save/:postId
  * @desc Save or unsave a post

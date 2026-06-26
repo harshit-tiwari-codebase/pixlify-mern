@@ -11,27 +11,58 @@ const {
   deleteChallenge,
 } = require("../controllers/challange.controller");
 
-const checkIn = require("../controllers/checkin.controller");
+const {
+  checkIn,
+  getChallengeProgress,
+  getChallengeCheckIns,
+  getChallengeHeatmap,
+  getChallengeDashboard,
+  getChallengeFeed
+} = require("../controllers/checkin.controller");
 
+// =====================
+// Static Routes
+// =====================
 
-// Create a challenge
+// Create challenge
 router.post("/create", identifyUser, createChallenge);
 
-// Get logged-in user's challenges
+//get challange feed 
+router.get("/feed", identifyUser, getChallengeFeed);
+
+// Dashboard
+router.get("/dashboard", identifyUser, getChallengeDashboard);
+
+// My challenges
 router.get("/my", identifyUser, getMyChallenges);
 
-// Get challenge details
-router.get("/:challengeId", identifyUser, getChallengeById);
+// =====================
+// Dynamic Routes
+// =====================
 
-// Delete challenge
-router.delete("/:challengeId", identifyUser, deleteChallenge);
+// Challenge Progress
+router.get("/:challengeId/progress", identifyUser, getChallengeProgress);
 
-// Daily challenge check-in
+// Challenge Timeline
+router.get("/:challengeId/checkins", identifyUser, getChallengeCheckIns);
+
+// Challenge Heatmap
+router.get("/:challengeId/heatmap", identifyUser, getChallengeHeatmap);
+
+// Daily Check-in
 router.post(
   "/:challengeId/checkin",
   identifyUser,
   upload.single("image"),
   checkIn
 );
+
+// Challenge Details
+router.get("/:challengeId", identifyUser, getChallengeById);
+
+// Delete Challenge
+router.delete("/:challengeId", identifyUser, deleteChallenge);
+
+
 
 module.exports = router;
