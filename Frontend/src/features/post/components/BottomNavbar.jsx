@@ -23,12 +23,12 @@ const BottomNavbar = () => {
     },
     {
       icon: PlusCircle,
-      path: "/challenges/create",
+      path: "/challange/create",
       label: "Create Challange",
     },
     {
       icon: Flame,
-      path: "/streaks",
+      path: "/streakPage",
       label: "Streaks",
     },
   ];
