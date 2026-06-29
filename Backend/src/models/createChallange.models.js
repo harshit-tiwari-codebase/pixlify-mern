@@ -15,6 +15,7 @@ const challengeSchema = new mongoose.Schema(
       ],
       required: true,
     },
+
     customCategory: {
       type: String,
       trim: true,
@@ -56,19 +57,46 @@ const challengeSchema = new mongoose.Schema(
       default: "public",
     },
 
+    // Challenge Status
     status: {
       type: String,
-      enum: ["active", "completed", "cancelled"],
+      enum: [
+        "active",
+        "completed",
+        "failed",
+        "cancelled",
+      ],
       default: "active",
+    },
+
+    // If challenge fails
+    failedDay: {
+      type: Number,
+      default: null,
+    },
+
+    failedAt: {
+      type: Date,
+      default: null,
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-// Helpful indexes
-challengeSchema.index({ createdBy: 1, category: 1, status: 1 });
-challengeSchema.index({ createdBy: 1 });
+// Indexes
+challengeSchema.index({
+  createdBy: 1,
+  category: 1,
+  status: 1,
+});
 
-module.exports = mongoose.model("pixlify-challenge", challengeSchema);
+challengeSchema.index({
+  createdBy: 1,
+});
+
+module.exports = mongoose.model(
+  "pixlify-challenge",
+  challengeSchema
+);

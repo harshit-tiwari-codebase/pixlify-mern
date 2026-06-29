@@ -1,5 +1,5 @@
 const ChallengeModel = require("../models/createChallange.models");
-const ChallengeProgressModel = require("../models/challangeProgress.models")
+const ChallengeProgressModel = require("../models/challangeProgress.models");
 
 /**
  * @route POST /api/challenge/create
@@ -9,13 +9,20 @@ const ChallengeProgressModel = require("../models/challangeProgress.models")
 
 const createChallenge = async (req, res) => {
   try {
-    const {
+    let {
       category,
       customCategory,
       description,
       duration,
       visibility,
     } = req.body;
+
+    // Trim inputs
+    category = category?.trim().toLowerCase();
+    customCategory = customCategory?.trim();
+    description = description?.trim();
+
+    duration = Number(duration);
 
     // Validate required fields
     if (!category || !description || !duration) {
@@ -25,7 +32,15 @@ const createChallenge = async (req, res) => {
       });
     }
 
-    // If category is custom, customCategory is required
+    // Validate duration
+    if (!Number.isInteger(duration) || duration < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Duration must be at least 1 day.",
+      });
+    }
+
+    // Validate custom category
     if (category === "custom" && !customCategory) {
       return res.status(400).json({
         success: false,
@@ -33,7 +48,7 @@ const createChallenge = async (req, res) => {
       });
     }
 
-    // Duplicate check
+    // Duplicate active challenge
     const query = {
       createdBy: req.user.id,
       status: "active",
@@ -41,7 +56,7 @@ const createChallenge = async (req, res) => {
 
     if (category === "custom") {
       query.category = "custom";
-      query.customCategory = customCategory.toLowerCase().trim();
+      query.customCategory = customCategory.toLowerCase();
     } else {
       query.category = category;
     }
@@ -57,16 +72,17 @@ const createChallenge = async (req, res) => {
 
     // Dates
     const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
 
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + Number(duration));
+    endDate.setDate(endDate.getDate() + duration - 1);
 
-    // Create challenge
+    // Create Challenge
     const challenge = await ChallengeModel.create({
       category,
       customCategory:
         category === "custom"
-          ? customCategory.toLowerCase().trim()
+          ? customCategory.toLowerCase()
           : "",
       description,
       duration,
@@ -106,26 +122,54 @@ const getMyChallenges = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const formattedChallenges = challenges.map((challenge) => {
-      const currentDay = Math.max(
-        0,
-        Math.floor(
-          (today - challenge.startDate) / (1000 * 60 * 60 * 24)
-        )
-      );
+    const formattedChallenges = await Promise.all(
+      challenges.map(async (challenge) => {
+        const startDate = new Date(challenge.startDate);
+        startDate.setHours(0, 0, 0, 0);
 
-      const progress = Math.min(
-        100,
-        Math.floor((currentDay / challenge.duration) * 100)
-      );
+        let currentDay =
+          Math.floor(
+            (today.getTime() - startDate.getTime()) /
+              (1000 * 60 * 60 * 24)
+          ) + 1;
 
-      return {
-        ...challenge.toObject(),
-        currentDay,
-        progress,
-      };
-    });
+        if (currentDay < 1) currentDay = 1;
+
+        if (currentDay > challenge.duration) {
+          currentDay = challenge.duration;
+        }
+
+        const completedDays =
+          await ChallengeProgressModel.countDocuments({
+            challengeId: challenge._id,
+            userId,
+            completed: true,
+          });
+
+        const remainingDays = Math.max(
+          challenge.duration - completedDays,
+          0
+        );
+
+        const progress = Number(
+          (
+            (completedDays / challenge.duration) *
+            100
+          ).toFixed(2)
+        );
+
+        return {
+          ...challenge.toObject(),
+
+          currentDay,
+          completedDays,
+          remainingDays,
+          progress,
+        };
+      })
+    );
 
     return res.status(200).json({
       success: true,
@@ -137,11 +181,10 @@ const getMyChallenges = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal Server Error.",
     });
   }
 };
-
 
 /**
  * @route GET /api/challenge/:challengeId
@@ -151,50 +194,83 @@ const getMyChallenges = async (req, res) => {
 const getChallengeById = async (req, res) => {
   try {
     const { challengeId } = req.params;
+    const userId = req.user.id;
 
-    const challenge = await ChallengeModel.findById(challengeId)
-      .populate("createdBy", "username profile_img");
+    const challenge = await ChallengeModel.findById(challengeId).populate(
+      "createdBy",
+      "username profile_img",
+    );
 
     if (!challenge) {
       return res.status(404).json({
         success: false,
-        message: "Challenge not found",
+        message: "Challenge not found.",
       });
     }
 
+    // Normalize dates
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const currentDay = Math.max(
-      0,
+    const startDate = new Date(challenge.startDate);
+    startDate.setHours(0, 0, 0, 0);
+
+    // Calculate current challenge day
+    let currentDay =
       Math.floor(
-        (today - challenge.startDate) /
+        (today.getTime() - startDate.getTime()) /
           (1000 * 60 * 60 * 24)
-      )
+      ) + 1;
+
+    if (currentDay < 1) currentDay = 1;
+
+    if (currentDay > challenge.duration) {
+      currentDay = challenge.duration;
+    }
+
+    // Completed days
+    const completedDays =
+      await ChallengeProgressModel.countDocuments({
+        challengeId,
+        userId: challenge.createdBy._id,
+        completed: true,
+      });
+
+    const remainingDays = Math.max(
+      challenge.duration - completedDays,
+      0
     );
 
-    const progress = Math.min(
-      100,
-      Math.floor(
-        (currentDay / challenge.duration) * 100
-      )
+    const progress = Number(
+      (
+        (completedDays / challenge.duration) *
+        100
+      ).toFixed(2)
     );
 
     return res.status(200).json({
       success: true,
       challenge,
-      currentDay,
-      progress,
+
+      stats: {
+        currentDay,
+        completedDays,
+        remainingDays,
+        progress,
+        status: challenge.status,
+        failedDay: challenge.failedDay,
+        failedAt: challenge.failedAt,
+      },
     });
   } catch (error) {
     console.error("Get Challenge Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal Server Error.",
     });
   }
 };
-
 
 /**
  * @route DELETE /api/challenge/:challengeId
@@ -206,8 +282,11 @@ const deleteChallenge = async (req, res) => {
     const { challengeId } = req.params;
     const userId = req.user.id;
 
-    // Check if challenge exists
-    const challenge = await ChallengeModel.findById(challengeId);
+    // Find challenge owned by user
+    const challenge = await ChallengeModel.findOne({
+      _id: challengeId,
+      createdBy: userId,
+    });
 
     if (!challenge) {
       return res.status(404).json({
@@ -216,11 +295,11 @@ const deleteChallenge = async (req, res) => {
       });
     }
 
-    // Check ownership
-    if (challenge.createdBy.toString() !== userId) {
-      return res.status(403).json({
+    // Prevent deleting completed challenges
+    if (challenge.status === "completed") {
+      return res.status(400).json({
         success: false,
-        message: "You are not authorized to delete this challenge.",
+        message: "Completed challenges cannot be deleted.",
       });
     }
 
@@ -237,7 +316,6 @@ const deleteChallenge = async (req, res) => {
       });
     }
 
-    // Delete challenge
     await ChallengeModel.findByIdAndDelete(challengeId);
 
     return res.status(200).json({
@@ -253,10 +331,9 @@ const deleteChallenge = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   createChallenge,
   getMyChallenges,
   getChallengeById,
-  deleteChallenge
+  deleteChallenge,
 };
