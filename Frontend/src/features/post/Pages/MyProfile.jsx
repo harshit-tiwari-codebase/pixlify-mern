@@ -75,7 +75,8 @@ const MyProfile = () => {
   if (!user) {
     return <ProfileSkeleton />;
   }
-
+console.log(user);
+console.log("Profile Image:", user.profile_img);
   return (
     <div className="w-full min-h-screen bg-black text-white flex justify-center">
       <div className="w-full max-w-md sm:max-w-2xl lg:max-w-5xl">
@@ -90,7 +91,7 @@ const MyProfile = () => {
                 <ArrowLeft size={22} />
               </button>
 
-              <h1 className="font-bold text-lg">{user.user}</h1>
+              <h1 className="font-bold text-lg">{user.username}</h1>
             </div>
 
             <Settings size={22} />
@@ -101,8 +102,8 @@ const MyProfile = () => {
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <img
-              src={user.profile}
-              alt=""
+              src={user.profile_img}
+              alt={user.username}
               className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border border-zinc-700"
             />
 
@@ -220,7 +221,9 @@ const MyProfile = () => {
         </div>
 
         {activeTab === "saved" && savedLoading && (
-          <p className="text-center text-zinc-500 mt-8">Loading saved posts...</p>
+          <p className="text-center text-zinc-500 mt-8">
+            Loading saved posts...
+          </p>
         )}
 
         {activeTab === "saved" && !savedLoading && savedPosts.length === 0 && (

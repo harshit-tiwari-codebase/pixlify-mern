@@ -31,19 +31,23 @@ export async function login(username, password) {
 }
 
 export async function editProfile(bio, profileImage) {
-    try {
-        const formData = new FormData();
-        formData.append("bio", bio);
+  try {
+    const formData = new FormData();
 
-        if (profileImage) {
-            formData.append("profileImage", profileImage);
-        }
+    formData.append("bio", bio);
 
-        const response = await api.put("/editProfile", formData);
-        return response.data;
-    } catch (error) {
-        throw error;
+    if (profileImage) {
+      formData.append("profileImage", profileImage);
     }
+
+    const response = await api.put("/editProfile", formData);
+
+    console.log("Edit Profile Response:", response.data);
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
 
 

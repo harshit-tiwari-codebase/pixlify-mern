@@ -5,11 +5,7 @@ export const authContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setuser] = useState(null);
-
-  // Login/Register loading
   const [loading, setloading] = useState(false);
-
-  // Initial authentication check loading
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   // Login
@@ -17,11 +13,9 @@ export function AuthProvider({ children }) {
     setloading(true);
 
     try {
-      await login(username, password);
+      const response = await login(username, password);
 
-      const response = await getMe();
-
-      setuser(response);
+      setuser(response.user);
 
       return response;
     } catch (error) {
@@ -38,6 +32,8 @@ export function AuthProvider({ children }) {
     try {
       const response = await register(username, email, password);
 
+      setuser(response.user);
+
       return response;
     } catch (error) {
       throw error;
@@ -46,22 +42,26 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Restore logged-in user
+  // Restore logged in user
   const handleGetMe = async () => {
-    try {
-      const response = await getMe();
+  try {
+    const response = await getMe();
 
-      setuser(response);
+    setuser({
+      ...response.user,
+      followersCount: response.followersCount,
+      followingCount: response.followingCount,
+      followers: response.followers,
+      following: response.following,
+      posts: response.posts,
+    });
 
-      return response;
-    } catch (error) {
-      setuser(null);
-
-      return null;
-    } finally {
-      setCheckingAuth(false);
-    }
-  };
+    return response;
+  } catch (error) {
+    setuser(null);
+    return null;
+  }
+};
 
   useEffect(() => {
     handleGetMe();
@@ -71,6 +71,7 @@ export function AuthProvider({ children }) {
     <authContext.Provider
       value={{
         user,
+        setuser,
         loading,
         checkingAuth,
         handleLogin,

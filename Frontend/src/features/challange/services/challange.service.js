@@ -2,6 +2,8 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: "http://localhost:3000/api/challenge",
+  baseURL: "https://pixlify-mern-1.onrender.com/api/challenge",
+
   withCredentials: true,
 });
 
@@ -49,9 +51,7 @@ export const getChallengeById = async (challengeId) => {
  * Heatmap
  */
 export const getChallengeHeatmap = async (challengeId) => {
-  const { data } = await API.get(
-    `/${challengeId}/heatmap`
-  );
+  const { data } = await API.get(`/${challengeId}/heatmap`);
   return data;
 };
 
@@ -59,28 +59,19 @@ export const getChallengeHeatmap = async (challengeId) => {
  * Check-ins
  */
 export const getChallengeCheckIns = async (challengeId) => {
-  const { data } = await API.get(
-    `/${challengeId}/checkins`
-  );
+  const { data } = await API.get(`/${challengeId}/checkins`);
   return data;
 };
 
 /**
  * Daily Check-in
  */
-export const challengeCheckIn = async (
-  challengeId,
-  formData
-) => {
-  const { data } = await API.post(
-    `/${challengeId}/checkin`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+export const challengeCheckIn = async (challengeId, formData) => {
+  const { data } = await API.post(`/${challengeId}/checkin`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return data;
 };
