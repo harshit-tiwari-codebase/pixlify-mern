@@ -30,15 +30,6 @@ export async function login(username, password) {
     }
 }
 
-export async function getMe(){
-    try {
-        const response = await api.get("/getme");
-        return response.data;
-    } catch (error) {
-        throw error
-    }
-}
-
 export async function editProfile(bio, profileImage) {
     try {
         const formData = new FormData();
@@ -49,6 +40,16 @@ export async function editProfile(bio, profileImage) {
         }
 
         const response = await api.put("/editProfile", formData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export async function getMe() {
+    try {
+        const response = await api.get("/getme");
         return response.data;
     } catch (error) {
         throw error;

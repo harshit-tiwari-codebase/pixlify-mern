@@ -83,7 +83,7 @@ const Register = () => {
             disabled={loading}
             className="mt-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-300 disabled:opacity-50"
           >
-            {loading ? "Registering " : "Registered"}
+          {loading ? "Registering..." : "Register"}
           </button>
         </form>
         <p className="text-zinc-400 text-center mt-6">

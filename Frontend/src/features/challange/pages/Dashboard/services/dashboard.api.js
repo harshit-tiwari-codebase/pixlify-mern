@@ -6,23 +6,7 @@ const API = axios.create({
 });
 
 /**
- * Create Challenge
- */
-export const createChallenge = async (payload) => {
-  const { data } = await API.post("/create", payload);
-  return data;
-};
-
-/**
- * Challenge Feed
- */
-export const getChallengeFeed = async () => {
-  const { data } = await API.get("/feed");
-  return data;
-};
-
-/**
- * Dashboard
+ * Dashboard Statistics
  */
 export const getDashboard = async () => {
   const { data } = await API.get("/dashboard");
@@ -46,22 +30,47 @@ export const getChallengeById = async (challengeId) => {
 };
 
 /**
- * Heatmap
+ * Challenge Progress
  */
-export const getChallengeHeatmap = async (challengeId) => {
+export const getChallengeProgress = async (challengeId) => {
   const { data } = await API.get(
-    `/${challengeId}/heatmap`
+    `/${challengeId}/progress`
   );
+
   return data;
 };
 
 /**
- * Check-ins
+ * Challenge Heatmap
  */
-export const getChallengeCheckIns = async (challengeId) => {
+export const getChallengeHeatmap = async (
+  challengeId
+) => {
+  const { data } = await API.get(
+    `/${challengeId}/heatmap`
+  );
+
+  return data;
+};
+
+/**
+ * Challenge Check-ins
+ */
+export const getChallengeCheckIns = async (
+  challengeId
+) => {
   const { data } = await API.get(
     `/${challengeId}/checkins`
   );
+
+  return data;
+};
+
+/**
+ * Challenge Feed
+ */
+export const getChallengeFeed = async () => {
+  const { data } = await API.get("/feed");
   return data;
 };
 
@@ -80,6 +89,19 @@ export const challengeCheckIn = async (
         "Content-Type": "multipart/form-data",
       },
     }
+  );
+
+  return data;
+};
+
+/**
+ * Delete Challenge
+ */
+export const deleteChallenge = async (
+  challengeId
+) => {
+  const { data } = await API.delete(
+    `/${challengeId}`
   );
 
   return data;

@@ -4,35 +4,36 @@ import { useNavigate } from "react-router-dom";
 import StatsCards from "./components/StatsCards";
 import ChallengeList from "./components/ChallengeList";
 import ChallengeDetails from "./components/ChallengeDetails";
+import useDashboard from "./hooks/useDashboard";
 
-const Dashboard = ({
-  dashboard,
-  loading,
-  challenges,
-  selectedChallenge,
-  setSelectedChallenge,
-  progress,
-  heatmap,
-  checkIns,
-  onCheckIn,
-}) => {
+const Dashboard = () => {
   const navigate = useNavigate();
+
+  const {
+    loading,
+    dashboard,
+    challenges,
+    challenge,
+    selectedChallenge,
+    setSelectedChallenge,
+    progress,
+    heatmap,
+    checkIns,
+    handleCheckIn,
+  } = useDashboard();
 
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-8">
+        {/* Header */}
 
         {/* Header */}
 
-       {/* Header */}
-
-<div className="mb-8 flex items-center justify-between border-b border-zinc-800 pb-5">
-
-  <div className="flex items-center gap-4">
-
-    <button
-      onClick={() => navigate(-1)}
-      className="
+        <div className="mb-8 flex items-center justify-between border-b border-zinc-800 pb-5">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="
         flex
         h-10
         w-10
@@ -45,39 +46,35 @@ const Dashboard = ({
         transition
         hover:border-violet-500
       "
-    >
-      <ArrowLeft size={18} />
-    </button>
+            >
+              <ArrowLeft size={18} />
+            </button>
 
-    <div>
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Dashboard
-      </h1>
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Dashboard
+              </h1>
 
-      <p className="mt-1 text-sm text-zinc-500">
-        Track your challenge progress.
-      </p>
-    </div>
+              <p className="mt-1 text-sm text-zinc-500">
+                Track your challenge progress.
+              </p>
+            </div>
+          </div>
 
-  </div>
+          <div className="hidden items-center gap-3 sm:flex">
+            <div className="rounded-full border border-zinc-800 px-4 py-2">
+              <span className="text-sm text-zinc-400">
+                {dashboard?.activeChallenges ?? 0} Active
+              </span>
+            </div>
 
-  <div className="hidden items-center gap-3 sm:flex">
-
-    <div className="rounded-full border border-zinc-800 px-4 py-2">
-      <span className="text-sm text-zinc-400">
-        {dashboard?.activeChallenges ?? 0} Active
-      </span>
-    </div>
-
-    <div className="rounded-full bg-violet-600 px-4 py-2">
-      <span className="text-sm font-medium">
-        {dashboard?.completionRate ?? 0}% Complete
-      </span>
-    </div>
-
-  </div>
-
-</div>
+            <div className="rounded-full bg-violet-600 px-4 py-2">
+              <span className="text-sm font-medium">
+                {dashboard?.completionRate ?? 0}% Complete
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Stats */}
 
@@ -90,7 +87,6 @@ const Dashboard = ({
         {/* ========================= */}
 
         <div className="hidden gap-6 lg:grid lg:grid-cols-12">
-
           <aside className="col-span-4">
             <ChallengeList
               loading={loading}
@@ -102,14 +98,13 @@ const Dashboard = ({
 
           <main className="col-span-8">
             <ChallengeDetails
-              challenge={selectedChallenge}
+              challenge={challenge}
               progress={progress}
               heatmap={heatmap}
               checkIns={checkIns}
-              onCheckIn={onCheckIn}
+              onCheckIn={handleCheckIn}
             />
           </main>
-
         </div>
 
         {/* ========================= */}
@@ -117,20 +112,15 @@ const Dashboard = ({
         {/* ========================= */}
 
         <div className="lg:hidden">
-
           {!selectedChallenge ? (
-
             <ChallengeList
               loading={loading}
               challenges={challenges}
               selectedChallenge={selectedChallenge}
               setSelectedChallenge={setSelectedChallenge}
             />
-
           ) : (
-
             <div className="animate-in fade-in slide-in-from-right-5 duration-300">
-
               <button
                 onClick={() => setSelectedChallenge(null)}
                 className="
@@ -153,19 +143,15 @@ const Dashboard = ({
               </button>
 
               <ChallengeDetails
-                challenge={selectedChallenge}
+                challenge={challenge}
                 progress={progress}
                 heatmap={heatmap}
                 checkIns={checkIns}
-                onCheckIn={onCheckIn}
+                onCheckIn={handleCheckIn}
               />
-
             </div>
-
           )}
-
         </div>
-
       </div>
     </div>
   );

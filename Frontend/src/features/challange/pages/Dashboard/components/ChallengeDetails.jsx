@@ -57,84 +57,59 @@ return (
   <div className="space-y-6">
     {/* Header */}
 
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {challenge.category === "Other"
-              ? challenge.customCategory
-              : challenge.category}
-          </h1>
+    <div className="rounded-2xl border border-zinc-800 bg-black p-6">
 
-          <p className="mt-3 max-w-2xl text-zinc-400">
-            {challenge.description}
-          </p>
+  <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <div className="flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-2 text-sm">
-              <Calendar size={16} />
-              {challenge.duration} Days
-            </div>
+    <div>
 
-            <div className="rounded-full bg-violet-500/10 px-4 py-2 text-sm capitalize text-violet-400">
-              {challenge.status}
-            </div>
-          </div>
-        </div>
-      </div>
+      <h2 className="text-2xl font-semibold">
+        {challenge.category === "Other"
+          ? challenge.customCategory
+          : challenge.category}
+      </h2>
+
+      <p className="mt-2 text-sm text-zinc-500">
+        {challenge.description}
+      </p>
+
     </div>
 
-    {/* Stats */}
+    <div className="flex items-center gap-3">
 
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <Stat
-        icon={Flag}
-        title="Current Day"
-        value={progress.currentDay}
-      />
+      <span className="rounded-full border border-zinc-800 px-3 py-1 text-sm text-zinc-400">
+        Day {progress?.currentDay}/{challenge.duration}
+      </span>
 
-      <Stat
-        icon={CheckCircle2}
-        title="Completed"
-        value={progress.completedDays}
-      />
+      <span className="rounded-full bg-violet-600/10 px-3 py-1 text-sm capitalize text-violet-400">
+        {challenge.status}
+      </span>
 
-      <Stat
-        icon={Clock3}
-        title="Remaining"
-        value={progress.remainingDays}
-      />
-
-      <Stat
-        icon={Target}
-        title="Progress"
-        value={`${progress.progress}%`}
-      />
     </div>
 
-    {/* Progress */}
+  </div>
 
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold">
-            Progress
-          </h2>
+  <div className="mt-8">
 
-          <p className="text-zinc-500">
-            Track your consistency
-          </p>
-        </div>
+    <div className="mb-3 flex items-center justify-between text-sm">
 
-        <h2 className="text-4xl font-bold text-violet-400">
-          {progress.progress}%
-        </h2>
-      </div>
+      <span className="text-zinc-500">
+        Progress
+      </span>
 
-      <div className="mt-6">
-        <ProgressBar value={progress.progress} />
-      </div>
+      <span className="font-medium">
+        {progress?.progress ?? 0}%
+      </span>
+
     </div>
+
+    <ProgressBar
+      value={progress?.progress ?? 0}
+    />
+
+  </div>
+
+</div>
 
     {/* Heatmap */}
 
@@ -153,10 +128,6 @@ return (
         onCheckIn={onCheckIn}
       />
 
-      <AchievementCard
-        challenge={challenge}
-        progress={progress}
-      />
     </div>
   </div>
 );

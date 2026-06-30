@@ -1,13 +1,18 @@
-import { getFeed, toggleLike , toggleFollowApi, toggleSavePost, getSavedPosts } from "../services/post.api";
+import {
+  getFeed,
+  toggleLike,
+  toggleFollowApi,
+  toggleSavePost,
+  getSavedPosts,
+  createPost,
+} from "../services/post.api";
+
 import { useContext } from "react";
 import { PostContext } from "../post.context";
-import { createPost } from "../services/post.api";
 import { toast } from "react-hot-toast";
-import { useAuth } from "../../auth/hooks/useAuth";
 
 export const usePost = () => {
   const context = useContext(PostContext);
-  const { handleGetMe } = useAuth();
 
   const {
     loading,
@@ -18,6 +23,9 @@ export const usePost = () => {
     setfeed,
   } = context;
 
+  // ==============================
+  // Get Feed
+  // ==============================
   const handleGetFeed = async () => {
     try {
       setloading(true);
@@ -32,6 +40,9 @@ export const usePost = () => {
     }
   };
 
+  // ==============================
+  // Like / Unlike
+  // ==============================
   const handleToggleLike = async (postId) => {
     try {
       const data = await toggleLike(postId);
@@ -54,6 +65,9 @@ export const usePost = () => {
     }
   };
 
+  // ==============================
+  // Save / Unsave
+  // ==============================
   const handleToggleSave = async (postId) => {
     try {
       const data = await toggleSavePost(postId);
@@ -75,60 +89,59 @@ export const usePost = () => {
     }
   };
 
+  // ==============================
+  // Saved Posts
+  // ==============================
   const handleGetSavedPosts = async () => {
     const data = await getSavedPosts();
     return data.map((savedPost) => savedPost.postId).filter(Boolean);
   };
 
-  async function handleCreatePost(caption, image) {
-  try {
-    const data = await createPost(caption, image);
+  // ==============================
+  // Create Post
+  // ==============================
+  const handleCreatePost = async (caption, image) => {
+    try {
+      const data = await createPost(caption, image);
 
-    toast.success(data.message);
-    await handleGetMe();
+      toast.success(data.message);
 
-    return data;
+      return data;
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to create post"
+      );
+    }
+  };
 
+  // ==============================
+  // Follow / Unfollow
+  // ==============================
+  const handleToggleFollow = async (followeeId) => {
+    try {
+      const data = await toggleFollowApi(followeeId);
 
-  } catch (error) {
-    toast.error(
-      error.response?.data?.message || "Failed to create post"
-    );
-  }
-}
+      setfeed((prevFeed) =>
+        prevFeed.map((post) => {
+          if (post.userId._id !== followeeId) return post;
 
-const handleToggleFollow = async (followeeId) => {
-  try {
-    const data = await toggleFollowApi(followeeId);
+          return {
+            ...post,
+            userId: {
+              ...post.userId,
+              isFollowing: data.isFollowing,
+            },
+          };
+        })
+      );
 
-    setfeed((prevFeed) =>
-      prevFeed.map((post) => {
-        if (post.userId._id !== followeeId) return post;
-
-        return {
-          ...post,
-          userId: {
-            ...post.userId,
-            isFollowing: data.isFollowing,
-          },
-        };
-      })
-    );
-
-    toast.success(data.message);
-    await handleGetMe();
-
-  } catch (error) {
-  console.log(error);
-  console.log(error.response?.data);
-
-  toast.error(
-    error.response?.data?.message || error.message
-  );
-}
-};
-
-
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || error.message
+      );
+    }
+  };
 
   return {
     loading,
@@ -139,6 +152,6 @@ const handleToggleFollow = async (followeeId) => {
     handleToggleSave,
     handleGetSavedPosts,
     handleCreatePost,
-    handleToggleFollow
+    handleToggleFollow,
   };
 };

@@ -1,9 +1,9 @@
 import React from "react";
-import { Link } from "react-router";
+import { Link ,useNavigate} from "react-router";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router";
+
 
 const Login = () => {
   const [username, setusername] = useState("");

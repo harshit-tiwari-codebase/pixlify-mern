@@ -5,14 +5,24 @@ export const authContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setuser] = useState(null);
+
+  // Login/Register loading
   const [loading, setloading] = useState(false);
 
+  // Initial authentication check loading
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // Login
   const handleLogin = async (username, password) => {
     setloading(true);
 
     try {
-      const response = await login(username, password);
-      setuser(response.user);
+      await login(username, password);
+
+      const response = await getMe();
+
+      setuser(response);
+
       return response;
     } catch (error) {
       throw error;
@@ -21,12 +31,13 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Register
   const handleRegister = async (username, email, password) => {
     setloading(true);
 
     try {
       const response = await register(username, email, password);
-      setuser(response.user);
+
       return response;
     } catch (error) {
       throw error;
@@ -35,12 +46,20 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Restore logged-in user
   const handleGetMe = async () => {
     try {
       const response = await getMe();
+
       setuser(response);
+
+      return response;
     } catch (error) {
       setuser(null);
+
+      return null;
+    } finally {
+      setCheckingAuth(false);
     }
   };
 
@@ -53,6 +72,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         loading,
+        checkingAuth,
         handleLogin,
         handleRegister,
         handleGetMe,

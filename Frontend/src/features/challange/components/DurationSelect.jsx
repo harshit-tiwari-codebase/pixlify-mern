@@ -7,22 +7,22 @@ import {
 
 const durations = [7, 14, 21, 30, 60, 90];
 
-const DurationSelect = () => {
-  const [selected, setSelected] = useState(30);
+const DurationSelect = ({
+  value,
+  onChange,
+}) => {
   const [open, setOpen] = useState(false);
 
   return (
     <div>
-
       <label className="mb-3 block text-sm font-medium text-zinc-300">
         Duration
       </label>
 
       <div className="relative">
-
         <button
           type="button"
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpen((prev) => !prev)}
           className="flex w-full items-center justify-between rounded-2xl border border-zinc-800 bg-black px-5 py-4 transition hover:border-violet-500"
         >
           <div className="flex items-center gap-3">
@@ -31,7 +31,7 @@ const DurationSelect = () => {
               className="text-violet-400"
             />
 
-            <span>{selected} Days</span>
+            <span>{value} Days</span>
           </div>
 
           <ChevronDown
@@ -43,20 +43,20 @@ const DurationSelect = () => {
         </button>
 
         {open && (
-          <div className="absolute left-0 right-0 z-20 mt-3 rounded-2xl border border-zinc-800 bg-zinc-950 shadow-xl">
-
+          <div className="absolute left-0 right-0 z-20 mt-3 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-xl">
             {durations.map((day) => (
               <button
                 key={day}
+                type="button"
                 onClick={() => {
-                  setSelected(day);
+                  onChange(day);
                   setOpen(false);
                 }}
                 className="flex w-full items-center justify-between px-5 py-4 transition hover:bg-zinc-900"
               >
-                {day} Days
+                <span>{day} Days</span>
 
-                {selected === day && (
+                {value === day && (
                   <Check
                     size={18}
                     className="text-green-500"
@@ -64,12 +64,9 @@ const DurationSelect = () => {
                 )}
               </button>
             ))}
-
           </div>
         )}
-
       </div>
-
     </div>
   );
 };

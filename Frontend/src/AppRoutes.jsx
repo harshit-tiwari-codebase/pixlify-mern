@@ -11,48 +11,54 @@ import Followers from "./features/post/Pages/Followers";
 import Following from "./features/post/Pages/Following";
 
 import ChallengeFeed from "./features/challange/pages/ChallangeFeed";
-
-
 import ChallengeProvider from "./features/challange/context/ChallangeContext";
 import CreateChallenge from "./features/challange/pages/CreateChallange";
 import Dashboard from "./features/challange/pages/Dashboard/Dashboard";
 
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
 
-        <Route path="/" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Public Routes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/" element={<Register />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
 
-        <Route path="/feed" element={<Feed />} />
-        <Route path="/createPost" element={<CreatePost />} />
-        <Route path="/myProfile" element={<MyProfile />} />
-        <Route path="/follower" element={<Followers />} />
-        <Route path="/following" element={<Following />} />
-        <Route path="/challange/create" element={<CreateChallenge />} />
-        
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
 
-        {/* Challenge Routes */}
-        <Route
-          path="/challangeFeed"
-          element={
-            <ChallengeProvider>
-              <ChallengeFeed />
-            </ChallengeProvider>
-          }
-        />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/createPost" element={<CreatePost />} />
+          <Route path="/myProfile" element={<MyProfile />} />
+          <Route path="/follower" element={<Followers />} />
+          <Route path="/following" element={<Following />} />
+          <Route path="/challange/create" element={<CreateChallenge />} />
 
-        <Route
-          path="/Dashboard"
-          element={
-            <ChallengeProvider>
-              <Dashboard />
-            </ChallengeProvider>
-          }
-        />
+          <Route
+            path="/challangeFeed"
+            element={
+              <ChallengeProvider>
+                <ChallengeFeed />
+              </ChallengeProvider>
+            }
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ChallengeProvider>
+                <Dashboard />
+              </ChallengeProvider>
+            }
+          />
+
+        </Route>
 
       </Routes>
     </BrowserRouter>
