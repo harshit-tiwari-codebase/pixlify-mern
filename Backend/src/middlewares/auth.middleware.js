@@ -1,39 +1,30 @@
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
-async function identifyUser (req,res,next){
- 
-        /**
-         * Get authentication token from cookies
-         */
-        const token =
-          req.cookies["auth-token"] ||
-          req.cookies["login-cookie"] ||
-          req.cookies["register-cookie"];
-    
-        /**
-         * Check if token exists
-         */
-        if (!token) {
-          return res.status(401).json({
-            message: "Authentication token is required",
-          });
-        }
-    
-        /**
-         * Verify JWT token
-         */
-        let decoded;
-    
-        try {
-          decoded = jwt.verify(token, process.env.JWT_SECRET);
-        } catch (error) {
-          return res.status(401).json({
-            message: "Invalid or expired token",
-          });
+const AUTH_COOKIE_NAME = "auth-token";
+
+const identifyUser = (req, res, next) => {
+  try {
+    // Get JWT from cookie
+    const token = req.cookies[AUTH_COOKIE_NAME];
+
+    if (!token) {
+      return res.status(401).json({
+        message: "Authentication required",
+      });
     }
 
+    // Verify JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach user payload to request
     req.user = decoded;
+
     next();
-}
+  } catch (error) {
+    return res.status(401).json({
+      message: "Invalid or expired token",
+    });
+  }
+};
 
 module.exports = identifyUser;

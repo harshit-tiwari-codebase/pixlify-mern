@@ -186,9 +186,10 @@ const getMyChallenges = async (req, res) => {
   }
 };
 
+
 /**
  * @route GET /api/challenge/:challengeId
- * @desc Get challenge details by ID
+ * @desc Get single challenge details
  * @access Private
  */
 const getChallengeById = async (req, res) => {
@@ -196,15 +197,24 @@ const getChallengeById = async (req, res) => {
     const { challengeId } = req.params;
     const userId = req.user.id;
 
+    // Find challenge
     const challenge = await ChallengeModel.findById(challengeId).populate(
       "createdBy",
-      "username profile_img",
+      "username profile_img"
     );
 
     if (!challenge) {
       return res.status(404).json({
         success: false,
         message: "Challenge not found.",
+      });
+    }
+
+    // Owner validation
+    if (challenge.createdBy._id.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized.",
       });
     }
 
@@ -223,43 +233,75 @@ const getChallengeById = async (req, res) => {
       ) + 1;
 
     if (currentDay < 1) currentDay = 1;
-
     if (currentDay > challenge.duration) {
       currentDay = challenge.duration;
     }
 
     // Completed days
-    const completedDays =
-      await ChallengeProgressModel.countDocuments({
-        challengeId,
-        userId: challenge.createdBy._id,
-        completed: true,
-      });
+    const completedDays = await ChallengeProgressModel.countDocuments({
+      challengeId,
+      userId,
+      completed: true,
+    });
+
+    // Already checked in today?
+    const checkedInToday = await ChallengeProgressModel.exists({
+      challengeId,
+      userId,
+      dayNumber: currentDay,
+    });
 
     const remainingDays = Math.max(
       challenge.duration - completedDays,
       0
     );
 
-    const progress = Number(
-      (
-        (completedDays / challenge.duration) *
-        100
-      ).toFixed(2)
+    const missedDays = Math.max(
+      currentDay - completedDays - (checkedInToday ? 0 : 1),
+      0
+    );
+
+    const completionPercentage = Number(
+      ((completedDays / challenge.duration) * 100).toFixed(2)
     );
 
     return res.status(200).json({
       success: true,
-      challenge,
+
+      challenge: {
+        _id: challenge._id,
+        category: challenge.category,
+        customCategory: challenge.customCategory,
+        description: challenge.description,
+        duration: challenge.duration,
+        visibility: challenge.visibility,
+        status: challenge.status,
+        failedDay: challenge.failedDay,
+        failedAt: challenge.failedAt,
+        startDate: challenge.startDate,
+        endDate: challenge.endDate,
+        createdAt: challenge.createdAt,
+        createdBy: challenge.createdBy,
+      },
 
       stats: {
         currentDay,
         completedDays,
         remainingDays,
-        progress,
-        status: challenge.status,
-        failedDay: challenge.failedDay,
-        failedAt: challenge.failedAt,
+        missedDays,
+        totalCheckIns: completedDays,
+        completionPercentage,
+
+        checkedInToday: Boolean(checkedInToday),
+
+        canCheckIn:
+          challenge.status === "active" &&
+          !checkedInToday,
+
+        nextCheckInDay: Math.min(
+          completedDays + 1,
+          challenge.duration
+        ),
       },
     });
   } catch (error) {

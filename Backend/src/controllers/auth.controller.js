@@ -1,16 +1,15 @@
 const crypto = require("crypto");
 const userModel = require("../models/user.models");
 const jwt = require("jsonwebtoken");
-const PostModel  =  require("../models/post.models")
-const followModel = require("../models/follow.models")
+const PostModel = require("../models/post.models");
+const followModel = require("../models/follow.models");
 
 const AUTH_COOKIE_NAME = "auth-token";
-
 
 /**
  * http://localhost:3000/api/auth/register
  */
- const registerController = async (req, res) => {
+const registerController = async (req, res) => {
   try {
     const { username, email, password, bio, profile_img } = req.body;
 
@@ -39,14 +38,19 @@ const AUTH_COOKIE_NAME = "auth-token";
     const token = jwt.sign(
       {
         id: user._id,
-        username : user.username
+        username: user.username,
       },
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
       },
     );
-    res.cookie(AUTH_COOKIE_NAME, token);
+    res.cookie(AUTH_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: false, // true in production with HTTPS
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
 
     return res.status(201).json({
       message: "user registered successfully ",
@@ -64,37 +68,50 @@ const AUTH_COOKIE_NAME = "auth-token";
       message: error.message,
     });
   }
-}
-
+};
 
 /**
  * http://localhost:3000/api/auth/login
  */
 const loginController = async (req, res) => {
- try {
-   const {username,email,password} = req.body ;
+  try {
+    const { username, email, password } = req.body;
 
-   const isUserExist = await userModel.findOne(  { $or : [{email : email} , {username : username}] }  ).select("+password");
+    const isUserExist = await userModel
+      .findOne({ $or: [{ email: email }, { username: username }] })
+      .select("+password");
 
-   if (!isUserExist) {
+    if (!isUserExist) {
       return res.status(404).json({
-        message: "User not found"
+        message: "User not found",
+      });
+    }
+
+    const isPasswordMatch =
+      isUserExist.password ===
+      crypto.createHash("sha256").update(password).digest("hex");
+
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: "incorrect password" });
+    }
+
+    const token = jwt.sign(
+      {
+        id: isUserExist._id,
+        username: isUserExist.username,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.cookie(AUTH_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: false, // true in production with HTTPS
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-   }
 
-   const isPasswordMatch =  isUserExist.password === crypto.createHash("sha256").update(password).digest("hex");
-   
-   if(!isPasswordMatch){
-    return res.status(401).json({message : "incorrect password"})
-   }
-
-   const token = jwt.sign({
-    id : isUserExist._id ,  username : isUserExist.username
-   },process.env.JWT_SECRET , {expiresIn : "1d"} );
-
-   res.cookie(AUTH_COOKIE_NAME , token );
-
-   return res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       token,
       user: {
@@ -105,14 +122,12 @@ const loginController = async (req, res) => {
         posts: [],
       },
     });
-
- } catch (error) {
-   return res.status(500).json({
-      message: error.message
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
     });
- }
-}
-
+  }
+};
 
 const getMeController = async (req, res) => {
   try {
@@ -126,8 +141,9 @@ const getMeController = async (req, res) => {
       });
     }
 
-    const posts = await PostModel.find({ userId })
-      .select("caption postUrl likesCount createdAt");
+    const posts = await PostModel.find({ userId }).select(
+      "caption postUrl likesCount createdAt",
+    );
 
     // Followers
     const followers = await followModel
@@ -139,25 +155,28 @@ const getMeController = async (req, res) => {
       .find({ follower: userId })
       .populate("followee", "username profile_img");
 
-   const followersList = followers.map((item) => ({
-  _id: item.follower._id,
-  username: item.follower.username,
-  profile_img: item.follower.profile_img,
-  isFollowing: true,
-}));
+    const followersList = followers.map((item) => ({
+      _id: item.follower._id,
+      username: item.follower.username,
+      profile_img: item.follower.profile_img,
+      isFollowing: true,
+    }));
 
-const followingList = following.map((item) => ({
-  _id: item.followee._id,
-  username: item.followee.username,
-  profile_img: item.followee.profile_img,
-  isFollowing: true,
-}));
+    const followingList = following.map((item) => ({
+      _id: item.followee._id,
+      username: item.followee.username,
+      profile_img: item.followee.profile_img,
+      isFollowing: true,
+    }));
 
     res.status(200).json({
-      user: user.username,
-      email: user.email,
-      bio: user.bio,
-      profile: user.profile_img,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profile_img: user.profile_img,
+      },
 
       followersCount: followersList.length,
       followingCount: followingList.length,
@@ -167,12 +186,10 @@ const followingList = following.map((item) => ({
 
       posts,
     });
-
   } catch (error) {
     res.status(500).json({
       message: error.message,
     });
   }
 };
-module.exports = {registerController , loginController ,getMeController};
-
+module.exports = { registerController, loginController, getMeController };
