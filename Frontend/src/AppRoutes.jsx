@@ -11,10 +11,12 @@ import Followers from "./features/post/Pages/Followers";
 import Following from "./features/post/Pages/Following";
 
 import ChallengeFeed from "./features/challange/pages/ChallangeFeed";
-import HeatmapPage from "./features/challange/pages/HeatmapPage";
+
 
 import ChallengeProvider from "./features/challange/context/ChallangeContext";
 import CreateChallenge from "./features/challange/pages/CreateChallange";
+import Dashboard from "./features/challange/pages/Dashboard/Dashboard";
+
 
 const AppRoutes = () => {
   return (
@@ -44,10 +46,10 @@ const AppRoutes = () => {
         />
 
         <Route
-          path="/streakPage"
+          path="/Dashboard"
           element={
             <ChallengeProvider>
-              <HeatmapPage />
+              <Dashboard />
             </ChallengeProvider>
           }
         />

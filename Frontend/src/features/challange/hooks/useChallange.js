@@ -16,7 +16,6 @@ const fetchChallengeFeed = async () => {
 
     const data = await getChallengeFeed();
 
-    console.log(data); // remove after testing
 
     setPosts(data.posts || []);
   } catch (error) {

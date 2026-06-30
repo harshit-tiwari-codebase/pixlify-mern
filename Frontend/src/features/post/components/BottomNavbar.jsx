@@ -4,6 +4,7 @@ import {
   Trophy,
   PlusCircle,
   Flame,
+  LayoutDashboard,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -27,9 +28,9 @@ const BottomNavbar = () => {
       label: "Create Challange",
     },
     {
-      icon: Flame,
-      path: "/streakPage",
-      label: "Streaks",
+      icon: LayoutDashboard,
+      path: "/Dashboard",
+      label: "Dashboard",
     },
   ];
 
