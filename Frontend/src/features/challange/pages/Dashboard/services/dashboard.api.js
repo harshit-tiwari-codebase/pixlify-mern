@@ -1,8 +1,8 @@
 import axios from "axios";
+import BASE_URL from "../../../../../config/url";
 
 const API = axios.create({
-  baseURL: "http://localhost:3000/api/challenge",
-    // baseURL: "https://pixlify-mern-1.onrender.com/api/challenge",
+  baseURL:`${BASE_URL}/api/challenge`,
   withCredentials: true,
 });
 

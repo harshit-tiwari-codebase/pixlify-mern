@@ -24,28 +24,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-7xl px-4 py-5 lg:px-8 lg:py-8">
+      <div className="mx-auto w-full max-w-screen-2xl px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
         {/* Header */}
-
-        {/* Header */}
-
-        <div className="mb-8 flex items-center justify-between border-b border-zinc-800 pb-5">
+        <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="
-        flex
-        h-10
-        w-10
-        items-center
-        justify-center
-        rounded-xl
-        border
-        border-zinc-800
-        bg-zinc-900
-        transition
-        hover:border-violet-500
-      "
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 transition hover:border-violet-500"
             >
               <ArrowLeft size={18} />
             </button>
@@ -77,7 +62,6 @@ const Dashboard = () => {
         </div>
 
         {/* Stats */}
-
         <div className="mb-8">
           <StatsCards dashboard={dashboard} />
         </div>
@@ -86,17 +70,21 @@ const Dashboard = () => {
         {/* Desktop */}
         {/* ========================= */}
 
-        <div className="hidden gap-6 lg:grid lg:grid-cols-12">
-          <aside className="col-span-4">
-            <ChallengeList
-              loading={loading}
-              challenges={challenges}
-              selectedChallenge={selectedChallenge}
-              setSelectedChallenge={setSelectedChallenge}
-            />
+        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
+          {/* Left Sidebar */}
+          <aside className="lg:col-span-4 xl:col-span-3">
+            <div className="sticky top-6">
+              <ChallengeList
+                loading={loading}
+                challenges={challenges}
+                selectedChallenge={selectedChallenge}
+                setSelectedChallenge={setSelectedChallenge}
+              />
+            </div>
           </aside>
 
-          <main className="col-span-8">
+          {/* Right Content */}
+          <main className="min-w-0 lg:col-span-8 xl:col-span-9">
             <ChallengeDetails
               challenge={challenge}
               progress={progress}
@@ -123,20 +111,7 @@ const Dashboard = () => {
             <div className="animate-in fade-in slide-in-from-right-5 duration-300">
               <button
                 onClick={() => setSelectedChallenge(null)}
-                className="
-                  mb-5
-                  flex
-                  items-center
-                  gap-2
-                  rounded-xl
-                  border
-                  border-zinc-800
-                  bg-zinc-900
-                  px-4
-                  py-3
-                  transition
-                  hover:border-violet-500
-                "
+                className="mb-5 flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 transition hover:border-violet-500"
               >
                 <ArrowLeft size={18} />
                 Back to Challenges

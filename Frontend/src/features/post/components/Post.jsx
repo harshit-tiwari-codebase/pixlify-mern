@@ -45,8 +45,8 @@ const handleOpenComments = async () => {
     <div className="bg-black text-white border border-zinc-800 rounded-md overflow-hidden">
       {/* {comment section} */}
       {showComments && (
-        <div className="fixed inset-0 bg-black/70 flex justify-center items-end z-50">
-          <div className="bg-zinc-900 w-full max-w-md h-[70vh] rounded-t-2xl flex flex-col lg:max-w-3xl">
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/70">
+         <div className="relative w-full max-w-md rounded-t-2xl bg-zinc-900 h-[70vh] flex flex-col lg:max-w-3xl">
             {/* Header */}
             <div className="flex justify-between items-center p-4 border-b border-zinc-700">
               <h2 className="font-semibold">Comments</h2>

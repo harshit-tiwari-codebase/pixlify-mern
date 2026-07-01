@@ -1,8 +1,8 @@
 import axios from "axios";
+import BASE_URL from "../../../config/url";
 const api = axios.create ({
-    // baseURL : "https://pixlify-mern-1.onrender.com/api/auth",
-    baseURL  : "http://localhost:3000/api/auth",
-    withCredentials:true
+  baseURL:`${BASE_URL}/api/auth`,
+  withCredentials:true
 })
 
 

@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
   };
 
   // Restore logged in user
-  const handleGetMe = async () => {
+ const handleGetMe = async () => {
   try {
     const response = await getMe();
 
@@ -60,6 +60,8 @@ export function AuthProvider({ children }) {
   } catch (error) {
     setuser(null);
     return null;
+  } finally {
+    setCheckingAuth(false);
   }
 };
 

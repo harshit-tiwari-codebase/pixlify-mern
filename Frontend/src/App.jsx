@@ -12,7 +12,7 @@ const App = () => {
           <Toaster
             position="top-right"
             toastOptions={{
-              duration: 3000,
+              duration:700,
             }}
           />
           <AppRoutes />

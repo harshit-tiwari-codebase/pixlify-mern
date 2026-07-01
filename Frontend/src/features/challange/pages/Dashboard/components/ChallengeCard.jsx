@@ -42,24 +42,26 @@ const ChallengeCard = ({
     statusStyles[challenge.status] ||
     statusStyles.active;
 
+  const displayCategory =
+    challenge?.category?.toLowerCase().trim() ===
+    "custom"
+      ? challenge.customCategory
+      : challenge.category;
+
   return (
     <button
       onClick={() => onSelect(challenge)}
-      className={`w-full rounded-3xl border p-5 text-left transition-all duration-300
-      ${
+      className={`w-full rounded-3xl border p-5 text-left transition-all duration-300 ${
         selected
           ? "border-violet-500 bg-zinc-900 shadow-xl shadow-violet-500/20"
           : "border-zinc-800 bg-zinc-900/70 hover:border-violet-500/40 hover:-translate-y-1"
       }`}
     >
       {/* Header */}
-
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-white">
-            {challenge.category === "Other"
-              ? challenge.customCategory
-              : challenge.category}
+          <h2 className="text-lg font-semibold text-white capitalize">
+            {displayCategory || "Untitled"}
           </h2>
 
           <p className="mt-1 line-clamp-2 text-sm text-zinc-400">
@@ -74,7 +76,6 @@ const ChallengeCard = ({
       </div>
 
       {/* Status */}
-
       <div
         className={`mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${style.bg} ${style.text} ${style.border}`}
       >
@@ -82,7 +83,6 @@ const ChallengeCard = ({
       </div>
 
       {/* Progress */}
-
       <div className="mt-6">
         <ProgressBar
           value={challenge.progress}
@@ -100,9 +100,7 @@ const ChallengeCard = ({
       </div>
 
       {/* Stats */}
-
       <div className="mt-6 grid grid-cols-2 gap-3">
-
         <div className="rounded-2xl bg-black/30 p-3">
           <div className="flex items-center gap-2 text-zinc-400">
             <CheckCircle2 size={16} />
@@ -128,13 +126,10 @@ const ChallengeCard = ({
             {challenge.remainingDays}
           </p>
         </div>
-
       </div>
 
       {/* Footer */}
-
       <div className="mt-6 flex items-center justify-between border-t border-zinc-800 pt-4">
-
         <div className="flex items-center gap-2 text-zinc-500">
           <Calendar size={15} />
 
@@ -152,7 +147,8 @@ const ChallengeCard = ({
           </div>
         )}
 
-        {challenge.status === "completed" && (
+        {challenge.status ===
+          "completed" && (
           <div className="flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-400">
             <CheckCircle2 size={14} />
             Completed

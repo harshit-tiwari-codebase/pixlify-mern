@@ -64,7 +64,7 @@ return (
     <div>
 
       <h2 className="text-2xl font-semibold">
-        {challenge.category === "Other"
+        {challenge.category === "custom"
           ? challenge.customCategory
           : challenge.category}
       </h2>
