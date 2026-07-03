@@ -11,6 +11,8 @@ const challengeSchema = new mongoose.Schema(
         "gym",
         "reading",
         "fitness",
+        "study",
+        "work",
         "custom",
       ],
       required: true,
