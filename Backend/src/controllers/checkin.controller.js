@@ -2,6 +2,9 @@ const ChallengeModel = require("../models/createChallange.models");
 const ChallengeProgressModel = require("../models/challangeProgress.models");
 const PostModel = require("../models/post.models");
 const imagekit = require("../config/ImageKit");
+const {
+  evaluateAndFailMissedChallenge,
+} = require("../utils/challengeStatus");
 
 
 
@@ -102,6 +105,18 @@ if (challenge.status === "completed") {
   return res.status(400).json({
     success: false,
     message: "Challenge already completed.",
+  });
+}
+
+const justFailed = await evaluateAndFailMissedChallenge(
+  challenge,
+  userId
+);
+
+if (justFailed) {
+  return res.status(400).json({
+    success: false,
+    message: `Challenge failed. You missed Day ${challenge.failedDay}.`,
   });
 }
 
@@ -414,6 +429,13 @@ const getChallengeCheckIns = async (req, res) => {
       });
     }
 
+    if (challenge.status === "active") {
+      await evaluateAndFailMissedChallenge(
+        challenge,
+        userId
+      );
+    }
+
     // Get challenge posts
     const checkIns = await PostModel.find({
       challengeId,
@@ -637,21 +659,36 @@ const getChallengeDashboard = async (req, res) => {
       createdBy: userId,
     });
 
-    const totalChallenges = challenges.length;
+    await Promise.all(
+      challenges.map(async (challenge) => {
+        if (challenge.status === "active") {
+          await evaluateAndFailMissedChallenge(
+            challenge,
+            userId
+          );
+        }
+      })
+    );
 
-    const activeChallenges = challenges.filter(
+    const refreshedChallenges = await ChallengeModel.find({
+      createdBy: userId,
+    });
+
+    const totalChallenges = refreshedChallenges.length;
+
+    const activeChallenges = refreshedChallenges.filter(
       (challenge) => challenge.status === "active"
     ).length;
 
-    const completedChallenges = challenges.filter(
+    const completedChallenges = refreshedChallenges.filter(
       (challenge) => challenge.status === "completed"
     ).length;
 
-    const failedChallenges = challenges.filter(
+    const failedChallenges = refreshedChallenges.filter(
       (challenge) => challenge.status === "failed"
     ).length;
 
-    const cancelledChallenges = challenges.filter(
+    const cancelledChallenges = refreshedChallenges.filter(
       (challenge) => challenge.status === "cancelled"
     ).length;
 
@@ -661,7 +698,7 @@ const getChallengeDashboard = async (req, res) => {
         completed: true,
       });
 
-    const totalChallengeDays = challenges.reduce(
+    const totalChallengeDays = refreshedChallenges.reduce(
       (sum, challenge) => sum + challenge.duration,
       0
     );

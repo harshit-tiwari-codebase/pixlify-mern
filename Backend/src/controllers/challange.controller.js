@@ -1,5 +1,8 @@
 const ChallengeModel = require("../models/createChallange.models");
 const ChallengeProgressModel = require("../models/challangeProgress.models");
+const {
+  evaluateAndFailMissedChallenge,
+} = require("../utils/challengeStatus");
 
 /**
  * @route POST /api/challenge/create
@@ -117,7 +120,23 @@ const getMyChallenges = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const challenges = await ChallengeModel.find({
+    let challenges = await ChallengeModel.find({
+      createdBy: userId,
+    }).sort({ createdAt: -1 });
+
+    await Promise.all(
+      challenges.map(async (challenge) => {
+        if (challenge.status === "active") {
+          await evaluateAndFailMissedChallenge(
+            challenge,
+            userId
+          );
+        }
+      })
+    );
+
+    // Refresh documents in case any active challenges failed
+    challenges = await ChallengeModel.find({
       createdBy: userId,
     }).sort({ createdAt: -1 });
 
@@ -216,6 +235,13 @@ const getChallengeById = async (req, res) => {
         success: false,
         message: "Unauthorized.",
       });
+    }
+
+    if (challenge.status === "active") {
+      await evaluateAndFailMissedChallenge(
+        challenge,
+        userId
+      );
     }
 
     // Normalize dates
