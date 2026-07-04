@@ -3,6 +3,7 @@ const userModel = require("../models/user.models");
 const jwt = require("jsonwebtoken");
 const PostModel = require("../models/post.models");
 const followModel = require("../models/follow.models");
+const { addTokenToBlacklist } = require("../utils/tokenBlacklist");
 
 const AUTH_COOKIE_NAME = "auth-token";
 
@@ -129,6 +130,26 @@ const loginController = async (req, res) => {
   }
 };
 
+const logoutController = async (req, res) => {
+  try {
+    const token = req.cookies[AUTH_COOKIE_NAME];
+
+    if (token) {
+      addTokenToBlacklist(token);
+    }
+
+    res.clearCookie(AUTH_COOKIE_NAME, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 const getMeController = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -192,4 +213,9 @@ const getMeController = async (req, res) => {
     });
   }
 };
-module.exports = { registerController, loginController, getMeController };
+module.exports = {
+  registerController,
+  loginController,
+  logoutController,
+  getMeController,
+};

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { isTokenBlacklisted } = require("../utils/tokenBlacklist");
 
 const AUTH_COOKIE_NAME = "auth-token";
 
@@ -11,6 +12,10 @@ const identifyUser = (req, res, next) => {
       return res.status(401).json({
         message: "Authentication required",
       });
+    }
+
+    if (isTokenBlacklisted(token)) {
+      return res.status(401).json({ message: "Token has been invalidated" });
     }
 
     // Verify JWT

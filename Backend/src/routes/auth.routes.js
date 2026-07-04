@@ -20,6 +20,8 @@ authRouter.post("/register", auth_controllers.registerController );
 
 authRouter.post("/login", auth_controllers.loginController );
 
+authRouter.post("/logout", auth_controllers.logoutController);
+
 authRouter.get("/getme" , identifyUser , auth_controllers.getMeController);
 
 authRouter.put(
