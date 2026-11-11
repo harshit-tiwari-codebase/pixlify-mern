@@ -2,18 +2,9 @@ const commentModel = require("../models/comments.models");
 const postModel = require("../models/post.models");
 
 /**
- * @route POST /api/comments/:postId
+ * @route POST /api/comment/create/:postId
  * @desc Create a comment on a post
  * @access Private
- *
- * @param {string} postId - MongoDB Post ID
- *
- * @body
- * {
- *   "comment": "This is an awesome post!"
- * }
- *
- * @returns {Object} Newly created comment with user details
  */
 async function createComment(req, res) {
   try {
@@ -51,7 +42,6 @@ async function createComment(req, res) {
     });
   } catch (error) {
     console.error(error);
-
     return res.status(500).json({
       message: "Internal Server Error",
     });
@@ -59,13 +49,9 @@ async function createComment(req, res) {
 }
 
 /**
- * @route GET /api/comments/:postId
+ * @route GET /api/comment/get-comments/:postId
  * @desc Get all comments of a specific post
- * @access Public
- *
- * @param {string} postId - MongoDB Post ID
- *
- * @returns {Array} List of comments with user details
+ * @access Private
  */
 async function getComments(req, res) {
   try {
@@ -82,14 +68,48 @@ async function getComments(req, res) {
     });
   } catch (error) {
     console.error(error);
-
     return res.status(500).json({
       message: "Internal Server Error",
     });
   }
 }
 
+/**
+ * @route DELETE /api/comment/:commentId
+ * @desc Delete a comment
+ * @access Private
+ */
+async function deleteComment(req, res) {
+  try {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+
+    const comment = await commentModel.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const post = await postModel.findById(comment.postId);
+    const isCommentOwner = comment.userId.toString() === userId.toString();
+    const isPostOwner = post && post.userId.toString() === userId.toString();
+
+    if (!isCommentOwner && !isPostOwner) {
+      return res.status(403).json({ message: "You are not authorized to delete this comment" });
+    }
+
+    await commentModel.findByIdAndDelete(commentId);
+
+    return res.status(200).json({
+      message: "Comment deleted successfully",
+      commentId,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createComment,
   getComments,
+  deleteComment,
 };

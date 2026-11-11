@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Sparkles, PlusCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import Post from "../components/Post";
 import PostSkeleton from "../components/PostSkeleton";
@@ -15,6 +17,7 @@ const Feed = () => {
     handleToggleLike,
     handleToggleFollow,
     handleToggleSave,
+    handleDeletePost,
   } = usePost();
 
   const [showNavbar, setShowNavbar] = useState(true);
@@ -29,29 +32,23 @@ const Feed = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Always show navbar at top
       if (currentScrollY < 20) {
         setShowNavbar(true);
-      }
-      // Scrolling Down
-      else if (currentScrollY > lastScrollY) {
+      } else if (currentScrollY > lastScrollY && currentScrollY > 60) {
         setShowNavbar(false);
-      }
-      // Scrolling Up
-      else {
+      } else {
         setShowNavbar(true);
       }
 
       lastScrollY = currentScrollY;
     };
 
-    window.addEventListener("scroll", handleScroll);
-
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <div className="w-full min-h-screen bg-black flex flex-col items-center">
+    <div className="w-full min-h-screen bg-black text-white flex flex-col items-center">
       {/* Animated Navbar */}
       <motion.div
         initial={{ y: 0 }}
@@ -67,14 +64,33 @@ const Feed = () => {
         <Navbar />
       </motion.div>
 
-      <div className="w-full max-w-md lg:max-w-3xl pt-20">
-        <div className="flex flex-col gap-5 px-2 pb-20">
+      <main className="w-full max-w-lg lg:max-w-xl pt-20 px-3 sm:px-0">
+        <div className="flex flex-col gap-6 pb-24">
           {loading ? (
             <>
               <PostSkeleton />
               <PostSkeleton />
               <PostSkeleton />
             </>
+          ) : feed?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-center py-20 px-4 bg-zinc-950 border border-zinc-800 rounded-2xl mt-4">
+              <div className="w-14 h-14 rounded-full bg-violet-600/10 border border-violet-500/20 flex items-center justify-center mb-4 text-violet-400">
+                <Sparkles size={26} />
+              </div>
+              <h2 className="text-lg font-bold text-white mb-1">
+                Your Feed is Quiet
+              </h2>
+              <p className="text-sm text-zinc-400 max-w-xs mb-6">
+                Be the first to share a moment, or discover creators to follow!
+              </p>
+              <Link
+                to="/createPost"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm transition"
+              >
+                <PlusCircle size={18} />
+                Create Post
+              </Link>
+            </div>
           ) : (
             feed?.map((post) => (
               <Post
@@ -83,11 +99,12 @@ const Feed = () => {
                 handleToggleLike={handleToggleLike}
                 handleToggleFollow={handleToggleFollow}
                 handleToggleSave={handleToggleSave}
+                handleDeletePost={handleDeletePost}
               />
             ))
           )}
         </div>
-      </div>
+      </main>
 
       <BottomNavbar />
     </div>

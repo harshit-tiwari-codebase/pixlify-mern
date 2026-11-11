@@ -5,6 +5,7 @@ import {
   toggleSavePost,
   getSavedPosts,
   createPost,
+  deletePostApi,
 } from "../services/post.api";
 
 import { useContext } from "react";
@@ -29,9 +30,7 @@ export const usePost = () => {
   const handleGetFeed = async () => {
     try {
       setloading(true);
-
       const data = await getFeed();
-
       setfeed(data.posts);
     } catch (error) {
       console.log(error);
@@ -55,11 +54,12 @@ export const usePost = () => {
             ...post,
             isLiked: data.liked,
             likesCount: data.liked
-              ? post.likesCount + 1
-              : post.likesCount - 1,
+              ? (post.likesCount || 0) + 1
+              : Math.max(0, (post.likesCount || 0) - 1),
           };
         })
       );
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -84,6 +84,7 @@ export const usePost = () => {
       );
 
       toast.success(data.message);
+      return data;
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }
@@ -100,17 +101,31 @@ export const usePost = () => {
   // ==============================
   // Create Post
   // ==============================
-  const handleCreatePost = async (caption, image) => {
+  const handleCreatePost = async (caption, image, tags = [], location = "") => {
     try {
-      const data = await createPost(caption, image);
-
+      const data = await createPost(caption, image, tags, location);
       toast.success(data.message);
-
       return data;
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to create post"
       );
+      throw error;
+    }
+  };
+
+  // ==============================
+  // Delete Post
+  // ==============================
+  const handleDeletePost = async (postId) => {
+    try {
+      const data = await deletePostApi(postId);
+      setfeed((prevFeed) => prevFeed.filter((p) => p._id !== postId));
+      toast.success(data.message || "Post deleted");
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete post");
+      return false;
     }
   };
 
@@ -123,7 +138,7 @@ export const usePost = () => {
 
       setfeed((prevFeed) =>
         prevFeed.map((post) => {
-          if (post.userId._id !== followeeId) return post;
+          if (post.userId?._id !== followeeId) return post;
 
           return {
             ...post,
@@ -136,6 +151,7 @@ export const usePost = () => {
       );
 
       toast.success(data.message);
+      return data;
     } catch (error) {
       toast.error(
         error.response?.data?.message || error.message
@@ -147,11 +163,13 @@ export const usePost = () => {
     loading,
     post,
     feed,
+    setfeed,
     handleGetFeed,
     handleToggleLike,
     handleToggleSave,
     handleGetSavedPosts,
     handleCreatePost,
+    handleDeletePost,
     handleToggleFollow,
   };
 };

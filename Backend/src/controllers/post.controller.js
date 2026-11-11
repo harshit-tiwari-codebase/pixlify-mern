@@ -2,9 +2,9 @@ const PostModel = require("../models/post.models");
 const likeModel = require("../models/like.model");
 const followModel = require("../models/follow.models");
 const saveModel = require("../models/save.model");
+const commentModel = require("../models/comments.models");
 const ImageKit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
-const jwt = require("jsonwebtoken");
 
 /**
  * Initialize ImageKit
@@ -17,65 +17,40 @@ const imagekit = new ImageKit({
  * @route POST /api/posts/create
  * @desc Create a new post with image upload
  * @access Private
- *
- * @body
- * FormData:
- * {
- *   "caption": "My first Pixlify post",
- *   "image": File
- * }
- *
- * @returns {Object} Created post details
  */
 async function PostCreate(req, res) {
   try {
-    /**
-     * Validate caption
-     */
     if (!req.body.caption) {
       return res.status(400).json({
         message: "Caption is required",
       });
     }
 
-    /**
-     * Validate image
-     */
     if (!req.file) {
       return res.status(400).json({
         message: "Image is required",
       });
     }
 
-    /**
-     * Upload image to ImageKit
-     */
     const uploadedFile = await imagekit.files.upload({
       file: await toFile(req.file.buffer, req.file.originalname),
       fileName: req.file.originalname,
       folder: "pixlifyPost",
     });
 
-    /**
-     * Create post in database
-     */
     const post = await PostModel.create({
       caption: req.body.caption,
       postUrl: uploadedFile.url,
       userId: req.user.id,
+      location: req.body.location || "",
+      tags: req.body.tags ? JSON.parse(req.body.tags) : [],
     });
 
-    /**
-     * Success response
-     */
     return res.status(201).json({
       message: "Post created successfully",
       post,
     });
   } catch (error) {
-    /**
-     * Unexpected server error
-     */
     return res.status(500).json({
       message: error.message,
     });
@@ -86,42 +61,34 @@ async function PostCreate(req, res) {
  * @route GET /api/posts/my-posts
  * @desc Get all posts created by the logged-in user
  * @access Private
- *
- * @returns {Array} User posts
  */
 async function GetPost(req, res) {
   const user = req.user.id;
 
-  let userPost = null;
   try {
-    userPost = await PostModel.find({ userId: user });
+    const userPost = await PostModel.find({ userId: user }).sort({ createdAt: -1 });
+    res.status(200).json({
+      message: "Posts fetched successfully",
+      posts: userPost,
+    });
   } catch (error) {
     return res.status(500).json({
       message: error.message,
     });
   }
-
-  res.status(200).json({
-    message: "Posts fetched successfully",
-    posts: userPost,
-  });
 }
 
 /**
  * @route GET /api/posts/details/:postId
- * @desc Get a specific post by ID
+ * @desc Get a specific post by ID with populated user & interactions
  * @access Private
- *
- * @param {string} postId - MongoDB Post ID
- *
- * @returns {Object} Post details
  */
 async function GetPostDets(req, res) {
   try {
     const userId = req.user.id;
     const postId = req.params.postId;
 
-    const post = await PostModel.findById(postId);
+    const post = await PostModel.findById(postId).populate("userId", "username profile_img bio");
 
     if (!post) {
       return res.status(404).json({
@@ -129,17 +96,26 @@ async function GetPostDets(req, res) {
       });
     }
 
-    const isAccessValid = post.userId.toString() === userId.toString();
+    const [isLiked, isSaved, isFollowing] = await Promise.all([
+      likeModel.findOne({ postId, userId }),
+      saveModel.findOne({ postId, userId }),
+      followModel.findOne({ follower: userId, followee: post.userId._id }),
+    ]);
 
-    if (!isAccessValid) {
-      return res.status(403).json({
-        message: "Forbidden content",
-      });
-    }
+    const postData = {
+      ...post.toObject(),
+      userId: {
+        ...post.userId.toObject(),
+        isFollowing: !!isFollowing,
+      },
+      isOwnPost: post.userId._id.toString() === userId.toString(),
+      isLiked: !!isLiked,
+      isSaved: !!isSaved,
+    };
 
     return res.status(200).json({
       message: "Post fetched successfully",
-      post,
+      post: postData,
     });
   } catch (error) {
     return res.status(500).json({
@@ -152,31 +128,20 @@ async function GetPostDets(req, res) {
  * @route POST /api/posts/toggle-like/:postId
  * @desc Like or unlike a post
  * @access Private
- *
- * @param {string} postId - MongoDB Post ID
- *
- * @returns {Object}
- * {
- *   success: true,
- *   liked: boolean,
- *   message: string
- * }
  */
 async function toggleLike(req, res) {
   try {
-
     const { postId } = req.params;
     const userId = req.user.id;
-    console.log(userId)
-    const post = await PostModel.findById(postId);
 
+    const post = await PostModel.findById(postId);
     if (!post) {
       return res.status(404).json({
         success: false,
         message: "Post not found",
       });
     }
-    
+
     const existingLike = await likeModel.findOne({
       postId,
       userId,
@@ -211,13 +176,11 @@ async function toggleLike(req, res) {
       message: "Post liked",
     });
   } catch (error) {
-
-
-  return res.status(500).json({
-    success: false,
-    message: error.message,
-  });
-}
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 /**
@@ -229,7 +192,6 @@ const getFeed = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Fetch only normal posts
     const dbPosts = await PostModel.find({
       isChallengePost: false,
     })
@@ -237,17 +199,10 @@ const getFeed = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log("Normal Feed Count:", dbPosts.length);
-    console.log(
-      dbPosts.map((post) => ({
-        id: post._id,
-        isChallengePost: post.isChallengePost,
-        caption: post.caption,
-      }))
-    );
-
     const posts = await Promise.all(
       dbPosts.map(async (post) => {
+        if (!post.userId) return null;
+
         const [isLiked, isFollowing, isSaved] = await Promise.all([
           likeModel.findOne({
             postId: post._id,
@@ -276,47 +231,37 @@ const getFeed = async (req, res) => {
       })
     );
 
+    const validPosts = posts.filter(Boolean);
+
     return res.status(200).json({
       success: true,
       message: "Posts fetched successfully",
-      posts,
+      posts: validPosts,
     });
   } catch (error) {
-    console.error(error);
-
     return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 };
+
 /**
- * @route POST /api/posts/toggle-save/:postId
+ * @route POST /api/posts/save/:postId
  * @desc Save or unsave a post
  * @access Private
- *
- * @param {string} postId - MongoDB Post ID
- *
- * @returns {Object}
- * {
- *   success: true,
- *   saved: boolean,
- *   message: string
- * }
  */
-async function toggleSavePost (req , res){
-
+async function toggleSavePost(req, res) {
   try {
-    
     const postId = req.params.postId;
     const userId = req.user.id;
 
-     const existingSave = await saveModel.findOne({
+    const existingSave = await saveModel.findOne({
       userId,
       postId,
-    }); 
+    });
 
-    if(existingSave){
+    if (existingSave) {
       await saveModel.findByIdAndDelete(existingSave._id);
 
       return res.status(200).json({
@@ -327,50 +272,27 @@ async function toggleSavePost (req , res){
     }
 
     const savedPost = await saveModel.create({
-      userId : userId,
-      postId : postId
-    })
+      userId,
+      postId,
+    });
 
-    res.status(200).json(
-      {
-        success: true,
-        saved: true,
-        message : "post saved successfully",
-        savedPost
-      }
-    )
-    
-    
-
-
-
-
-
-
-
-
-
-
-  } 
-  
-  
-  catch (error) {
+    res.status(200).json({
+      success: true,
+      saved: true,
+      message: "Post saved successfully",
+      savedPost,
+    });
+  } catch (error) {
     return res.status(500).json({
-      message : error.message
-    })
+      message: error.message,
+    });
   }
-
 }
 
 /**
- * @route GET /api/posts/saved
+ * @route GET /api/posts/getSaved
  * @desc Get all saved posts of the logged-in user
  * @access Private
- *
- * @returns {Array}
- * Saved posts with:
- * - post details
- * - post creator details
  */
 async function getSavedPosts(req, res) {
   try {
@@ -391,6 +313,39 @@ async function getSavedPosts(req, res) {
   }
 }
 
+/**
+ * @route DELETE /api/posts/:postId
+ * @desc Delete a post owned by the logged-in user
+ * @access Private
+ */
+async function deletePost(req, res) {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+
+    const post = await PostModel.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (post.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ message: "You are not authorized to delete this post" });
+    }
+
+    await PostModel.findByIdAndDelete(postId);
+    await likeModel.deleteMany({ postId });
+    await saveModel.deleteMany({ postId });
+    await commentModel.deleteMany({ postId });
+
+    return res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
+      postId,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 
 module.exports = {
   PostCreate,
@@ -399,5 +354,6 @@ module.exports = {
   toggleLike,
   getFeed,
   toggleSavePost,
-  getSavedPosts
+  getSavedPosts,
+  deletePost,
 };

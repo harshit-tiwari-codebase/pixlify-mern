@@ -6,9 +6,8 @@ const identifyUser = require("../middlewares/auth.middleware");
 
 const commentController = require("../controllers/comment.controller");
 
-
-commentRouter.post("/create/:postId" , identifyUser , commentController.createComment);
-commentRouter.get("/get-comments/:postId" , identifyUser , commentController.getComments);
+commentRouter.post("/create/:postId", identifyUser, commentController.createComment);
+commentRouter.get("/get-comments/:postId", identifyUser, commentController.getComments);
+commentRouter.delete("/:commentId", identifyUser, commentController.deleteComment);
 
 module.exports = commentRouter;
-
