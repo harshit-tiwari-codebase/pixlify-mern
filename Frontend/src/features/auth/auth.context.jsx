@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { login, register, getMe } from "./services/auth.api";
+import { login, register, logout, getMe } from "./services/auth.api";
 
 export const authContext = createContext();
 
@@ -11,12 +11,9 @@ export function AuthProvider({ children }) {
   // Login
   const handleLogin = async (username, password) => {
     setloading(true);
-
     try {
       const response = await login(username, password);
-
       setuser(response.user);
-
       return response;
     } catch (error) {
       throw error;
@@ -28,12 +25,9 @@ export function AuthProvider({ children }) {
   // Register
   const handleRegister = async (username, email, password) => {
     setloading(true);
-
     try {
       const response = await register(username, email, password);
-
       setuser(response.user);
-
       return response;
     } catch (error) {
       throw error;
@@ -42,28 +36,37 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setuser(null);
+    }
+  };
+
   // Restore logged in user
- const handleGetMe = async () => {
-  try {
-    const response = await getMe();
-
-    setuser({
-      ...response.user,
-      followersCount: response.followersCount,
-      followingCount: response.followingCount,
-      followers: response.followers,
-      following: response.following,
-      posts: response.posts,
-    });
-
-    return response;
-  } catch (error) {
-    setuser(null);
-    return null;
-  } finally {
-    setCheckingAuth(false);
-  }
-};
+  const handleGetMe = async () => {
+    try {
+      const response = await getMe();
+      setuser({
+        ...response.user,
+        followersCount: response.followersCount,
+        followingCount: response.followingCount,
+        followers: response.followers,
+        following: response.following,
+        posts: response.posts,
+      });
+      return response;
+    } catch (error) {
+      setuser(null);
+      return null;
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
 
   useEffect(() => {
     handleGetMe();
@@ -78,6 +81,7 @@ export function AuthProvider({ children }) {
         checkingAuth,
         handleLogin,
         handleRegister,
+        handleLogout,
         handleGetMe,
       }}
     >
