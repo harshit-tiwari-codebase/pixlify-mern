@@ -5,6 +5,7 @@ import StatsCards from "./components/StatsCards";
 import ChallengeList from "./components/ChallengeList";
 import ChallengeDetails from "./components/ChallengeDetails";
 import useDashboard from "./hooks/useDashboard";
+import BottomNavbar from "../../../post/components/BottomNavbar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Dashboard = () => {
   } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pb-24">
       <div className="mx-auto w-full max-w-screen-2xl px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-5 sm:flex-row sm:items-center sm:justify-between">
@@ -128,6 +129,8 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      <BottomNavbar />
     </div>
   );
 };
