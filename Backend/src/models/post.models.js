@@ -24,6 +24,16 @@ const postSchema = new mongoose.Schema(
       default: 0,
     },
 
+    location: {
+      type: String,
+      default: "",
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+    },
+
     // ---------------- Challenge Fields ----------------
 
     isChallengePost: {
