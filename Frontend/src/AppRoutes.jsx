@@ -7,6 +7,7 @@ import Register from "./features/auth/pages/Register";
 import Feed from "./features/post/Pages/Feed";
 import CreatePost from "./features/post/Pages/CreatePost";
 import MyProfile from "./features/post/Pages/MyProfile";
+import UserProfile from "./features/post/Pages/UserProfile";
 import Followers from "./features/post/Pages/Followers";
 import Following from "./features/post/Pages/Following";
 
@@ -22,7 +23,6 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* Public Routes */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<Register />} />
@@ -32,10 +32,10 @@ const AppRoutes = () => {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-
           <Route path="/feed" element={<Feed />} />
           <Route path="/createPost" element={<CreatePost />} />
           <Route path="/myProfile" element={<MyProfile />} />
+          <Route path="/profile/:username" element={<UserProfile />} />
           <Route path="/follower" element={<Followers />} />
           <Route path="/following" element={<Following />} />
           <Route path="/challange/create" element={<CreateChallenge />} />
@@ -57,9 +57,7 @@ const AppRoutes = () => {
               </ChallengeProvider>
             }
           />
-
         </Route>
-
       </Routes>
     </BrowserRouter>
   );
