@@ -9,6 +9,7 @@
  * - User Profiles
  * - Profile Editing
  * - Profile Image Uploads
+ * - User Search
  *
  * Author: Harshit Tiwari
  * Project: Pixlify
@@ -26,30 +27,16 @@ const imagekit = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
 });
 
-
-
-
 /**
- * @route POST /api/user/follow/:id
+ * @route POST /api/user/toggle-follow/:id
  * @desc Follow or unfollow a user
  * @access Private
- *
- * @param {string} id - User ID of the target user
- *
- * @returns {Object}
- * {
- *   isFollowing: boolean,
- *   message: string
- * }
  */
 async function toggleFollowController(req, res) {
   try {
-    
     const followerId = req.user.id;
-
     const followeeId = req.params.id;
 
-    // Searching for is Followee user exist in the database or not
     const user = await userModel.findById(followeeId);
     if (!user) {
       return res.status(404).json({
@@ -63,13 +50,11 @@ async function toggleFollowController(req, res) {
       });
     }
 
-    //to check the follower already following or not
     const existingFollow = await followModel.findOne({
       follower: followerId,
       followee: followeeId,
     });
 
-    //unfollow logic
     if (existingFollow) {
       await followModel.findByIdAndDelete(existingFollow._id);
 
@@ -79,7 +64,7 @@ async function toggleFollowController(req, res) {
       });
     }
 
-    const follow = await followModel.create({
+    await followModel.create({
       follower: followerId,
       followee: followeeId,
     });
@@ -96,33 +81,16 @@ async function toggleFollowController(req, res) {
 }
 
 /**
- * @route GET /api/user/following/:id
+ * @route GET /api/user/getfollowing/:id
  * @desc Get all users followed by a specific user
  * @access Private
- *
- * @param {string} id - User ID
- *
- * @returns {Object}
- * {
- *   count: number,
- *   following: [
- *     {
- *       _id: string,
- *       username: string,
- *       profile_img: string,
- *       isFollowing: boolean
- *     }
- *   ]
- * }
  */
 async function getFollowingController(req, res) {
   try {
     const { id } = req.params;
-
     const loggedInUserId = req.user.id;
 
     const user = await userModel.findById(id);
-
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -135,6 +103,7 @@ async function getFollowingController(req, res) {
 
     const formattedFollowing = await Promise.all(
       following.map(async (item) => {
+        if (!item.followee) return null;
         const isFollowing = await followModel.exists({
           follower: loggedInUserId,
           followee: item.followee._id,
@@ -149,9 +118,11 @@ async function getFollowingController(req, res) {
       })
     );
 
+    const validFollowing = formattedFollowing.filter(Boolean);
+
     return res.status(200).json({
-      count: formattedFollowing.length,
-      following: formattedFollowing,
+      count: validFollowing.length,
+      following: validFollowing,
     });
   } catch (error) {
     return res.status(500).json({
@@ -160,35 +131,17 @@ async function getFollowingController(req, res) {
   }
 }
 
-
 /**
- * @route GET /api/user/followers/:id
+ * @route GET /api/user/getfollowers/:id
  * @desc Get all followers of a specific user
  * @access Private
- *
- * @param {string} id - User ID
- *
- * @returns {Object}
- * {
- *   count: number,
- *   followers: [
- *     {
- *       _id: string,
- *       username: string,
- *       profile_img: string,
- *       isFollowing: boolean
- *     }
- *   ]
- * }
  */
 async function getFollowersController(req, res) {
   try {
     const { id } = req.params;
-
     const loggedInUserId = req.user.id;
 
     const user = await userModel.findById(id);
-
     if (!user) {
       return res.status(404).json({
         message: "User not found",
@@ -201,6 +154,7 @@ async function getFollowersController(req, res) {
 
     const formattedFollowers = await Promise.all(
       followers.map(async (item) => {
+        if (!item.follower) return null;
         const isFollowing = await followModel.exists({
           follower: loggedInUserId,
           followee: item.follower._id,
@@ -215,10 +169,62 @@ async function getFollowersController(req, res) {
       })
     );
 
+    const validFollowers = formattedFollowers.filter(Boolean);
+
     return res.status(200).json({
-      count: formattedFollowers.length,
-      followers: formattedFollowers,
+      count: validFollowers.length,
+      followers: validFollowers,
     });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * @route GET /api/user/search
+ * @desc Search users by query
+ * @access Private
+ */
+async function searchUsersController(req, res) {
+  try {
+    const { q } = req.query;
+    const loggedInUserId = req.user?.id;
+
+    if (!q || !q.trim()) {
+      return res.status(200).json({ users: [] });
+    }
+
+    const queryRegex = new RegExp(q.trim(), "i");
+    const users = await userModel
+      .find({ username: queryRegex })
+      .select("username bio profile_img")
+      .limit(15);
+
+    const formattedUsers = await Promise.all(
+      users.map(async (u) => {
+        let isFollowing = false;
+        if (loggedInUserId && loggedInUserId.toString() !== u._id.toString()) {
+          const exists = await followModel.exists({
+            follower: loggedInUserId,
+            followee: u._id,
+          });
+          isFollowing = !!exists;
+        }
+
+        return {
+          _id: u._id,
+          username: u.username,
+          bio: u.bio,
+          profile_img: u.profile_img,
+          isFollowing,
+          isSelf: loggedInUserId ? loggedInUserId.toString() === u._id.toString() : false,
+        };
+      })
+    );
+
+    return res.status(200).json({ users: formattedUsers });
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -229,53 +235,69 @@ async function getFollowersController(req, res) {
 /**
  * @route GET /api/user/profile/:username
  * @desc Get public profile information by username
- * @access Public
- *
- * @param {string} username - Username of the user
- *
- * @returns {Object}
- * User profile information
+ * @access Private
  */
 async function getUserProfile(req, res) {
-  const { username } = req.params;
+  try {
+    const { username } = req.params;
+    const loggedInUserId = req.user?.id;
+
+    const user = await userModel.findOne({ username }).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const posts = await PostModel.find({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .select("caption postUrl likesCount createdAt");
+
+    const followersCount = await followModel.countDocuments({ followee: user._id });
+    const followingCount = await followModel.countDocuments({ follower: user._id });
+
+    let isFollowing = false;
+    if (loggedInUserId && loggedInUserId.toString() !== user._id.toString()) {
+      const exists = await followModel.exists({
+        follower: loggedInUserId,
+        followee: user._id,
+      });
+      isFollowing = !!exists;
+    }
+
+    const isOwnProfile = loggedInUserId ? loggedInUserId.toString() === user._id.toString() : false;
+
+    return res.status(200).json({
+      user: {
+        _id: user._id,
+        username: user.username,
+        bio: user.bio,
+        profile_img: user.profile_img,
+      },
+      followersCount,
+      followingCount,
+      isFollowing,
+      isOwnProfile,
+      posts,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
 }
 
 /**
  * @route PUT /api/user/edit-profile
  * @desc Update logged-in user's profile
  * @access Private
- *
- * @body
- * FormData:
- * {
- *   "bio": "Full Stack Developer",
- *   "profile_img": File
- * }
- *
- * Notes:
- * - Username cannot be changed
- * - Email cannot be changed
- * - Password cannot be changed
- * - Only bio and profile image are editable
- *
- * @returns {Object}
- * {
- *   message: string,
- *   user: {
- *     username: string,
- *     email: string,
- *     bio: string,
- *     profile: string
- *   }
- * }
  */
-async function editProfile(req ,res){
+async function editProfile(req, res) {
   try {
     const userId = req.user.id;
     const { bio, username, email, password, profile_img } = req.body;
 
     const currentUser = await userModel.findById(userId);
-
     if (!currentUser) {
       return res.status(404).json({
         message: "User not found",
@@ -289,7 +311,6 @@ async function editProfile(req ,res){
     }
 
     const updates = {};
-
     if (bio !== undefined) {
       updates.bio = bio;
     }
@@ -337,6 +358,7 @@ module.exports = {
   toggleFollowController,
   getFollowersController,
   getFollowingController,
+  searchUsersController,
   getUserProfile,
-  editProfile
+  editProfile,
 };
