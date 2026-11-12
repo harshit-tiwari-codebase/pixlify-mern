@@ -60,32 +60,35 @@ const CategorySelect = ({
   const Icon = selected.icon;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="relative">
-        <label className="mb-3 block text-sm font-medium text-zinc-300">
+        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-black">
           Category
         </label>
 
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="flex w-full items-center justify-between rounded-2xl border border-zinc-800 bg-black px-5 py-4 transition hover:border-violet-500"
+          className="flex w-full items-center justify-between rounded-2xl border-2 border-black bg-white px-4 py-3 font-bold text-sm text-black shadow-[2px_2px_0px_#000] transition active:scale-95"
         >
-          <div className="flex items-center gap-3">
-            <Icon className="text-violet-400" size={20} />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl border-2 border-black bg-[#A0E7D4] flex items-center justify-center text-black">
+              <Icon size={16} />
+            </div>
             <span>{selected.label}</span>
           </div>
 
           <ChevronDown
             size={18}
-            className={`transition ${open ? "rotate-180" : ""}`}
+            className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           />
         </button>
 
         {open && (
-          <div className="absolute left-0 right-0 z-50 mt-3 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-xl">
+          <div className="absolute left-0 right-0 z-50 mt-2 overflow-hidden rounded-2xl border-2 border-black bg-white shadow-[4px_4px_0px_#000] py-1">
             {categories.map((item) => {
               const ItemIcon = item.icon;
+              const isChosen = value === item.value;
 
               return (
                 <button
@@ -95,22 +98,16 @@ const CategorySelect = ({
                     onChange(item.value);
                     setOpen(false);
                   }}
-                  className="flex w-full items-center justify-between px-5 py-4 transition hover:bg-zinc-900"
+                  className={`flex w-full items-center justify-between px-4 py-2.5 text-xs font-bold transition ${
+                    isChosen ? "bg-[#D5F94C] text-black" : "text-black hover:bg-[#EBE6FB]"
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <ItemIcon
-                      size={18}
-                      className="text-violet-400"
-                    />
+                  <div className="flex items-center gap-2.5">
+                    <ItemIcon size={16} />
                     <span>{item.label}</span>
                   </div>
 
-                  {value === item.value && (
-                    <Check
-                      size={18}
-                      className="text-green-500"
-                    />
-                  )}
+                  {isChosen && <Check size={16} className="stroke-[3]" />}
                 </button>
               );
             })}
@@ -120,18 +117,16 @@ const CategorySelect = ({
 
       {value === "custom" && (
         <div>
-          <label className="mb-3 block text-sm font-medium text-zinc-300">
+          <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-black">
             Custom Category
           </label>
 
           <input
             type="text"
             value={customCategory}
-            onChange={(e) =>
-              onCustomCategoryChange(e.target.value)
-            }
-            placeholder="e.g. Meditation, Music, Yoga..."
-            className="w-full rounded-2xl border border-zinc-800 bg-black px-5 py-4 text-white outline-none transition focus:border-violet-500"
+            onChange={(e) => onCustomCategoryChange(e.target.value)}
+            placeholder="e.g. Photography, Art, Baking..."
+            className="w-full rounded-2xl border-2 border-black bg-white px-4 py-3 text-xs font-bold text-black placeholder:text-zinc-400 outline-none shadow-[2px_2px_0px_#000]"
           />
         </div>
       )}

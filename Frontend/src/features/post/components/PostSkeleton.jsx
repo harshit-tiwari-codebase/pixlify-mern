@@ -2,39 +2,31 @@ import React from "react";
 
 const PostSkeleton = () => {
   return (
-    <div className="bg-black border border-zinc-800 rounded-md overflow-hidden animate-pulse">
+    <div className="bg-white border-[2.5px] border-black rounded-[32px] p-5 shadow-[4px_4px_0px_#000] overflow-hidden animate-pulse">
       {/* Header */}
-      <div className="flex items-center gap-3 p-3">
-        <div className="w-10 h-10 rounded-full bg-zinc-800"></div>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-11 h-11 rounded-2xl border-2 border-black bg-zinc-200"></div>
 
         <div className="flex flex-col gap-2">
-          <div className="h-3 w-24 bg-zinc-800 rounded"></div>
-          <div className="h-2 w-16 bg-zinc-800 rounded"></div>
+          <div className="h-3.5 w-28 bg-zinc-200 rounded-md"></div>
+          <div className="h-2.5 w-20 bg-zinc-100 rounded-md"></div>
         </div>
       </div>
 
       {/* Image */}
-      <div className="w-full aspect-square bg-zinc-800"></div>
+      <div className="w-full aspect-square bg-[#FED7A5]/30 rounded-[24px] border-2 border-black mb-4"></div>
 
       {/* Actions */}
-      <div className="p-3">
-        <div className="flex gap-4 mb-4">
-          <div className="w-6 h-6 rounded-full bg-zinc-800"></div>
-          <div className="w-6 h-6 rounded-full bg-zinc-800"></div>
-          <div className="w-6 h-6 rounded-full bg-zinc-800"></div>
-        </div>
+      <div className="flex gap-2 mb-3">
+        <div className="w-20 h-8 rounded-2xl border-2 border-black bg-zinc-100"></div>
+        <div className="w-20 h-8 rounded-2xl border-2 border-black bg-zinc-100"></div>
+        <div className="w-9 h-8 rounded-2xl border-2 border-black bg-zinc-100"></div>
+      </div>
 
-        {/* Likes */}
-        <div className="h-3 w-20 bg-zinc-800 rounded mb-3"></div>
-
-        {/* Caption */}
-        <div className="space-y-2">
-          <div className="h-3 w-full bg-zinc-800 rounded"></div>
-          <div className="h-3 w-3/4 bg-zinc-800 rounded"></div>
-        </div>
-
-        {/* Time */}
-        <div className="h-2 w-16 bg-zinc-800 rounded mt-4"></div>
+      {/* Caption */}
+      <div className="space-y-2">
+        <div className="h-3 w-full bg-zinc-200 rounded"></div>
+        <div className="h-3 w-3/4 bg-zinc-200 rounded"></div>
       </div>
     </div>
   );

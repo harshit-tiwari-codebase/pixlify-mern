@@ -27,77 +27,97 @@ const Following = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex justify-center bg-black text-white pb-24">
-      <div className="w-full max-w-2xl">
-        <header className="sticky top-0 z-30 bg-black/90 backdrop-blur-md w-full h-14 flex items-center justify-between px-4 border-b border-zinc-800/80">
+    <div className="w-full min-h-screen flex justify-center bg-[#EBE6FB] text-black pb-28">
+      <div className="w-full max-w-md sm:max-w-lg px-4 pt-3">
+        {/* Header */}
+        <header className="w-full h-14 flex items-center justify-between mb-4 border-b-2 border-black">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition"
+              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white border-2 border-black shadow-[2px_2px_0px_#000] hover:bg-zinc-50 active:scale-95 transition"
             >
               <ArrowLeft size={18} />
             </button>
-            <h1 className="text-base font-bold">Following</h1>
+            <h1 className="text-xl font-extrabold text-black tracking-tight">
+              Following
+            </h1>
           </div>
-          <span className="text-xs text-zinc-500 font-medium">
-            {followingList.length} {followingList.length === 1 ? "person" : "people"}
+          <span className="text-xs font-bold text-zinc-600 bg-white px-3 py-1 rounded-full border-2 border-black shadow-[1px_1px_0px_#000]">
+            {followingList.length}
           </span>
         </header>
 
-        <div className="p-3 sm:p-4">
+        {/* Following List */}
+        <div>
           {followingList.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              {followingList.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-zinc-950 border border-zinc-850 hover:border-zinc-700 transition"
-                >
-                  <Link
-                    to={`/profile/${item.username}`}
-                    className="flex items-center gap-3 min-w-0 flex-1"
-                  >
-                    <img
-                      src={
-                        item.profile_img ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          item.username
-                        )}&background=8b5cf6&color=fff`
-                      }
-                      alt={item.username}
-                      className="w-11 h-11 rounded-full object-cover border border-zinc-800 flex-shrink-0"
-                    />
+            <div className="flex flex-col gap-3">
+              {followingList.map((item, index) => {
+                const pastelBgs = [
+                  "bg-[#A0E7D4]",
+                  "bg-[#FED7A5]",
+                  "bg-[#BFB9FA]",
+                  "bg-[#FFAEC0]",
+                  "bg-[#D5F94C]",
+                ];
+                const bg = pastelBgs[index % pastelBgs.length];
 
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-semibold text-white hover:underline truncate">
-                        {item.username}
-                      </h3>
-                      <p className="text-xs text-zinc-500 truncate">
-                        @{item.username}
-                      </p>
-                    </div>
-                  </Link>
-
-                  <button
-                    onClick={() => handleToggleFollow(item._id)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition ${
-                      item.isFollowing
-                        ? "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-red-500 hover:text-red-400"
-                        : "border-violet-500 bg-violet-600 hover:bg-violet-700 text-white"
-                    }`}
+                return (
+                  <div
+                    key={item._id}
+                    className="flex items-center justify-between p-3.5 rounded-2xl bg-white border-2 border-black shadow-[2px_2px_0px_#000] hover:scale-[1.01] transition"
                   >
-                    {item.isFollowing ? "Following" : "Follow"}
-                  </button>
-                </div>
-              ))}
+                    <Link
+                      to={`/profile/${item.username}`}
+                      className="flex items-center gap-3 min-w-0 flex-1"
+                    >
+                      {item.profile_img ? (
+                        <img
+                          src={item.profile_img}
+                          alt={item.username}
+                          className="w-12 h-12 rounded-2xl border-2 border-black object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div
+                          className={`w-12 h-12 rounded-2xl border-2 border-black ${bg} flex items-center justify-center font-extrabold text-lg text-black flex-shrink-0`}
+                        >
+                          {(item.username || "U")[0].toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-extrabold text-black truncate">
+                          {item.username}
+                        </h3>
+                        <p className="text-xs text-zinc-500 font-medium truncate">
+                          @{item.username}
+                        </p>
+                      </div>
+                    </Link>
+
+                    <button
+                      onClick={() => handleToggleFollow(item._id)}
+                      className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 border-black shadow-[1px_1px_0px_#000] transition active:scale-95 ${
+                        item.isFollowing
+                          ? "bg-white text-black hover:bg-zinc-100"
+                          : "bg-[#FF6B4A] text-white hover:bg-[#ff5a36]"
+                      }`}
+                    >
+                      {item.isFollowing ? "Following" : "Follow"}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <div className="h-[60vh] flex flex-col items-center justify-center text-center p-4">
-              <UserCheck className="w-12 h-12 text-zinc-600 mb-3" />
-              <h2 className="text-base font-semibold text-zinc-300">
+            <div className="py-20 flex flex-col items-center justify-center text-center p-6 bg-white border-2 border-black rounded-[32px] shadow-[4px_4px_0px_#000]">
+              <div className="w-14 h-14 rounded-2xl bg-[#FED7A5] border-2 border-black flex items-center justify-center mb-3 shadow-[2px_2px_0px_#000]">
+                <UserCheck size={26} />
+              </div>
+              <h2 className="text-base font-extrabold text-black">
                 Not following anyone yet
               </h2>
-              <p className="text-zinc-500 text-xs mt-1 max-w-xs">
-                Explore the feed or search creators to find people to follow.
+              <p className="text-zinc-600 text-xs mt-1 max-w-xs font-medium">
+                Explore the feed and connect with creators and friends!
               </p>
             </div>
           )}

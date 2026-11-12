@@ -108,9 +108,9 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
         ...prev,
         isSaved: data.saved,
       }));
-      toast.success(data.message);
+      toast.success(data.message || (data.saved ? "Saved" : "Removed"));
     } catch (err) {
-      toast.error("Failed to save post");
+      toast.error("Action failed");
     }
   };
 
@@ -127,7 +127,7 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
       }));
       toast.success(data.message);
     } catch (err) {
-      toast.error("Action failed");
+      toast.error("Follow failed");
     }
   };
 
@@ -181,71 +181,64 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
     (currentUser && post?.userId?._id && currentUser._id === post.userId._id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5 animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-4xl max-h-[92vh] bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row"
+        className="relative w-full max-w-4xl max-h-[90vh] bg-white border-[2.5px] border-black rounded-[32px] overflow-hidden shadow-[6px_6px_0px_#000] flex flex-col md:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-20 p-1.5 rounded-full bg-black/60 text-zinc-300 hover:text-white hover:bg-black/80 transition"
+          className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-xl border-2 border-black bg-white flex items-center justify-center text-black hover:bg-zinc-100 shadow-[2px_2px_0px_#000] transition"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
         {loading ? (
-          <div className="w-full h-80 flex items-center justify-center text-zinc-500">
+          <div className="w-full h-80 flex items-center justify-center text-zinc-500 font-bold text-sm">
             Loading post...
           </div>
         ) : !post ? (
-          <div className="w-full h-80 flex items-center justify-center text-zinc-500">
+          <div className="w-full h-80 flex items-center justify-center text-zinc-500 font-bold text-sm">
             Post not found
           </div>
         ) : (
           <>
             {/* Left: Image Container */}
-            <div className="w-full md:w-3/5 bg-black flex items-center justify-center max-h-[50vh] md:max-h-[85vh] overflow-hidden select-none">
+            <div className="w-full md:w-3/5 bg-[#FED7A5]/30 flex items-center justify-center max-h-[45vh] md:max-h-[85vh] overflow-hidden select-none border-b-2 md:border-b-0 md:border-r-2 border-black">
               <img
                 src={post.postUrl}
                 alt={post.caption}
-                className="w-full h-full object-contain max-h-[50vh] md:max-h-[85vh]"
+                className="w-full h-full object-contain max-h-[45vh] md:max-h-[85vh]"
               />
             </div>
 
             {/* Right: Details & Comments */}
-            <div className="w-full md:w-2/5 flex flex-col max-h-[42vh] md:max-h-[85vh] border-t md:border-t-0 md:border-l border-zinc-800/80 bg-zinc-950">
+            <div className="w-full md:w-2/5 flex flex-col max-h-[45vh] md:max-h-[85vh] bg-white">
               {/* Header */}
-              <div className="flex items-center justify-between p-3.5 border-b border-zinc-800/80">
-                <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center justify-between p-4 border-b-2 border-black bg-[#EBE6FB]">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <Link
                     to={`/profile/${post.userId?.username}`}
                     onClick={onClose}
                     className="flex-shrink-0"
                   >
-                    <img
-                      src={
-                        post.userId?.profile_img ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          post.userId?.username || "User"
-                        )}&background=6366f1&color=fff`
-                      }
-                      alt={post.userId?.username}
-                      className="w-9 h-9 rounded-full object-cover border border-zinc-700"
-                    />
+                    <div className="w-9 h-9 rounded-xl border-2 border-black bg-[#FFAEC0] flex items-center justify-center font-bold text-black text-sm">
+                      {(post.userId?.username || "U")[0].toUpperCase()}
+                    </div>
                   </Link>
 
                   <div className="min-w-0">
                     <Link
                       to={`/profile/${post.userId?.username}`}
                       onClick={onClose}
-                      className="text-sm font-semibold text-white hover:underline truncate block"
+                      className="text-xs font-bold text-black hover:underline truncate block"
                     >
                       {post.userId?.username}
                     </Link>
                     {post.location && (
-                      <span className="flex items-center gap-1 text-[11px] text-zinc-400 truncate">
-                        <MapPin size={11} />
+                      <span className="flex items-center gap-1 text-[11px] text-zinc-500 truncate">
+                        <MapPin size={10} />
                         {post.location}
                       </span>
                     )}
@@ -254,10 +247,10 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
                   {!isOwner && (
                     <button
                       onClick={handleFollow}
-                      className={`ml-2 px-2.5 py-1 text-xs font-semibold rounded-md border transition ${
+                      className={`ml-1 px-3 py-0.5 text-xs font-bold rounded-full border-2 border-black transition ${
                         post.userId?.isFollowing
-                          ? "border-zinc-700 text-zinc-300 hover:border-red-500 hover:text-red-400"
-                          : "border-violet-500 bg-violet-600 text-white hover:bg-violet-700"
+                          ? "bg-zinc-100 text-zinc-600"
+                          : "bg-[#FF6B4A] text-white"
                       }`}
                     >
                       {post.userId?.isFollowing ? "Following" : "Follow"}
@@ -266,22 +259,22 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
                 </div>
 
                 {/* More options menu */}
-                <div className="relative">
+                <div className="relative mr-8 md:mr-0">
                   <button
                     onClick={() => setShowMenu(!showMenu)}
-                    className="p-1 text-zinc-400 hover:text-white rounded-md"
+                    className="p-1 text-zinc-600 hover:text-black rounded-lg"
                   >
                     <MoreHorizontal size={18} />
                   </button>
 
                   {showMenu && (
-                    <div className="absolute right-0 mt-1 w-44 rounded-xl border border-zinc-800 bg-zinc-900 shadow-xl p-1 z-30">
+                    <div className="absolute right-0 mt-1 w-44 rounded-2xl border-2 border-black bg-white shadow-[3px_3px_0px_#000] p-1.5 z-30">
                       <button
                         onClick={() => {
                           setShowMenu(false);
                           handleShare();
                         }}
-                        className="w-full text-left px-3 py-2 text-xs text-zinc-200 hover:bg-zinc-800 rounded-lg flex items-center gap-2"
+                        className="w-full text-left px-3 py-2 text-xs font-bold text-black hover:bg-[#EBE6FB] rounded-xl flex items-center gap-2"
                       >
                         <Share2 size={14} />
                         Copy Link
@@ -293,7 +286,7 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
                             setShowMenu(false);
                             setConfirmDelete(true);
                           }}
-                          className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2"
                         >
                           <Trash2 size={14} />
                           Delete Post
@@ -305,55 +298,38 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
               </div>
 
               {/* Caption & Comments List */}
-              <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 text-sm divide-y divide-zinc-900">
-                {/* Caption item */}
-                <div className="flex items-start gap-3 pb-2">
-                  <img
-                    src={
-                      post.userId?.profile_img ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        post.userId?.username || "User"
-                      )}&background=6366f1&color=fff`
-                    }
-                    alt=""
-                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-zinc-200 leading-snug">
-                      <span className="font-semibold text-white mr-1.5">
-                        {post.userId?.username}
-                      </span>
-                      {post.caption}
-                    </p>
-
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {post.tags.map((t, idx) => (
-                          <span
-                            key={idx}
-                            className="text-xs text-violet-400 font-medium"
-                          >
-                            #{t.replace(/^#/, "")}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <span className="text-[11px] text-zinc-500 mt-1 block">
-                      {new Date(post.createdAt || post.updatedAt).toLocaleDateString()}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
+                {/* Caption */}
+                <div className="p-3 rounded-2xl bg-zinc-50 border-2 border-black shadow-[2px_2px_0px_#000]">
+                  <p className="text-black leading-relaxed">
+                    <span className="font-bold mr-1.5">
+                      {post.userId?.username}
                     </span>
-                  </div>
+                    {post.caption}
+                  </p>
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {post.tags.map((t, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D5F94C] border border-black"
+                        >
+                          #{t.replace(/^#/, "")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Comments */}
-                <div className="pt-2 space-y-3">
+                <div className="space-y-2">
                   {loadingComments ? (
-                    <p className="text-center text-xs text-zinc-500 py-4">
+                    <p className="text-center text-xs text-zinc-500 py-3">
                       Loading comments...
                     </p>
                   ) : comments.length === 0 ? (
-                    <p className="text-center text-xs text-zinc-500 py-4">
-                      No comments yet. Start the conversation!
+                    <p className="text-center text-xs text-zinc-500 py-3">
+                      No comments yet.
                     </p>
                   ) : (
                     comments.map((comment) => {
@@ -364,36 +340,24 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
                       return (
                         <div
                           key={comment._id}
-                          className="flex items-start justify-between gap-2 group"
+                          className="flex items-start justify-between gap-2 p-2.5 rounded-xl border border-black/20 bg-white"
                         >
-                          <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                            <img
-                              src={
-                                comment.userId?.profile_img ||
-                                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                  comment.userId?.username || "User"
-                                )}&background=4f46e5&color=fff`
-                              }
-                              alt=""
-                              className="w-7 h-7 rounded-full object-cover flex-shrink-0"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs text-zinc-200 leading-snug break-words">
-                                <span className="font-semibold text-white mr-1.5">
-                                  {comment.userId?.username}
-                                </span>
-                                {comment.comment}
-                              </p>
-                              <span className="text-[10px] text-zinc-500">
-                                {new Date(comment.createdAt).toLocaleDateString()}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-black leading-snug break-words">
+                              <span className="font-bold mr-1.5">
+                                {comment.userId?.username}
                               </span>
-                            </div>
+                              {comment.comment}
+                            </p>
+                            <span className="text-[10px] text-zinc-400 mt-0.5 block">
+                              {new Date(comment.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
 
                           {canDeleteComment && (
                             <button
                               onClick={() => handleDeleteComment(comment._id)}
-                              className="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-red-400 transition"
+                              className="text-zinc-400 hover:text-red-500 p-1"
                               title="Delete comment"
                             >
                               <Trash2 size={13} />
@@ -407,49 +371,42 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
               </div>
 
               {/* Actions & Comment Input */}
-              <div className="p-3 border-t border-zinc-800/80 bg-zinc-950">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
+              <div className="p-3.5 border-t-2 border-black bg-[#EBE6FB]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={handleLike}
-                      className="transition active:scale-125"
+                      className="px-3 py-1 rounded-full border-2 border-black bg-white flex items-center gap-1.5 text-xs font-bold shadow-[2px_2px_0px_#000] active:scale-95"
                     >
                       <Heart
-                        size={22}
+                        size={15}
                         className={
                           post.isLiked
-                            ? "fill-red-500 text-red-500"
-                            : "text-zinc-300 hover:text-white"
+                            ? "fill-[#FF6B4A] text-[#FF6B4A]"
+                            : "text-black"
                         }
                       />
+                      <span>{post.likesCount || 0}</span>
                     </button>
 
                     <button
                       onClick={handleShare}
-                      className="text-zinc-300 hover:text-white transition"
+                      className="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center text-black shadow-[2px_2px_0px_#000] active:scale-95"
                     >
-                      <Share2 size={20} />
+                      <Share2 size={14} />
                     </button>
                   </div>
 
                   <button
                     onClick={handleSave}
-                    className="transition active:scale-110"
+                    className="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center text-black shadow-[2px_2px_0px_#000] active:scale-95"
                   >
                     <Bookmark
-                      size={22}
-                      className={
-                        post.isSaved
-                          ? "fill-white text-white"
-                          : "text-zinc-300 hover:text-white"
-                      }
+                      size={14}
+                      className={post.isSaved ? "fill-black text-black" : ""}
                     />
                   </button>
                 </div>
-
-                <p className="text-xs font-semibold text-white mb-2">
-                  {post.likesCount || 0} {post.likesCount === 1 ? "like" : "likes"}
-                </p>
 
                 <form onSubmit={handleAddComment} className="flex gap-2">
                   <input
@@ -457,12 +414,12 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Add a comment..."
-                    className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder:text-zinc-500 outline-none focus:border-violet-500"
+                    className="flex-1 bg-white border-2 border-black rounded-2xl px-3.5 py-1.5 text-xs text-black placeholder:text-zinc-500 outline-none"
                   />
                   <button
                     type="submit"
                     disabled={!commentText.trim() || submittingComment}
-                    className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white rounded-lg text-xs font-semibold transition"
+                    className="px-4 py-1.5 bg-[#FF6B4A] hover:bg-[#ff5a36] disabled:opacity-40 text-white rounded-2xl border-2 border-black text-xs font-bold transition shadow-[2px_2px_0px_#000]"
                   >
                     <Send size={13} />
                   </button>
@@ -475,23 +432,23 @@ const PostDetailModal = ({ postId, initialPost, onClose, onPostDeleted }) => {
 
       {/* Delete Confirmation Modal */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/80 p-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-white">Delete Post?</h3>
-            <p className="text-xs text-zinc-400">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white border-2 border-black rounded-[28px] p-5 max-w-sm w-full space-y-4 shadow-[5px_5px_0px_#000]">
+            <h3 className="text-base font-bold text-black">Delete Post?</h3>
+            <p className="text-xs text-zinc-600">
               Are you sure you want to delete this post? This action cannot be undone.
             </p>
             <div className="flex gap-2 justify-end pt-2">
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="px-4 py-2 text-xs rounded-lg border border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+                className="px-4 py-2 text-xs font-bold rounded-xl border-2 border-black bg-white hover:bg-zinc-100"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeletePost}
                 disabled={deleting}
-                className="px-4 py-2 text-xs rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold disabled:opacity-50"
+                className="px-4 py-2 text-xs font-bold rounded-xl bg-red-500 text-white border-2 border-black hover:bg-red-600 disabled:opacity-50"
               >
                 {deleting ? "Deleting..." : "Delete"}
               </button>

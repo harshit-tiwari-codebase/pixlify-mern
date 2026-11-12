@@ -7,159 +7,117 @@ import {
   XCircle,
   Trophy,
 } from "lucide-react";
-
 import ProgressBar from "./ProgressBar";
 
 const statusStyles = {
   active: {
-    text: "text-green-400",
-    bg: "bg-green-500/10",
-    border: "border-green-500/20",
+    bg: "bg-[#D5F94C]",
+    text: "text-black",
   },
   completed: {
-    text: "text-sky-400",
-    bg: "bg-sky-500/10",
-    border: "border-sky-500/20",
+    bg: "bg-[#A0E7D4]",
+    text: "text-black",
   },
   failed: {
-    text: "text-red-400",
-    bg: "bg-red-500/10",
-    border: "border-red-500/20",
+    bg: "bg-[#FFAEC0]",
+    text: "text-black",
   },
   cancelled: {
-    text: "text-zinc-400",
-    bg: "bg-zinc-500/10",
-    border: "border-zinc-500/20",
+    bg: "bg-zinc-200",
+    text: "text-black",
   },
 };
 
-const ChallengeCard = ({
-  challenge,
-  selected,
-  onSelect,
-}) => {
-  const style =
-    statusStyles[challenge.status] ||
-    statusStyles.active;
+const ChallengeCard = ({ challenge, selected, onSelect }) => {
+  const style = statusStyles[challenge.status] || statusStyles.active;
 
   const displayCategory =
-    challenge?.category?.toLowerCase().trim() ===
-    "custom"
+    challenge?.category?.toLowerCase().trim() === "custom"
       ? challenge.customCategory
       : challenge.category;
 
   return (
     <button
       onClick={() => onSelect(challenge)}
-      className={`w-full rounded-3xl border p-5 text-left transition-all duration-300 ${
+      className={`w-full rounded-[28px] border-2 border-black p-4 sm:p-5 text-left transition-all duration-200 ${
         selected
-          ? "border-violet-500 bg-zinc-900 shadow-xl shadow-violet-500/20"
-          : "border-zinc-800 bg-zinc-900/70 hover:border-violet-500/40 hover:-translate-y-1"
+          ? "bg-[#FED7A5]/50 shadow-[4px_4px_0px_#000] scale-[1.01]"
+          : "bg-white shadow-[2px_2px_0px_#000] hover:bg-[#EBE6FB]/30 hover:-translate-y-0.5"
       }`}
     >
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white capitalize">
+        <div className="min-w-0 flex-1 pr-2">
+          <h2 className="text-base font-extrabold text-black capitalize truncate">
             {displayCategory || "Untitled"}
           </h2>
-
-          <p className="mt-1 line-clamp-2 text-sm text-zinc-400">
+          <p className="mt-1 line-clamp-2 text-xs font-semibold text-zinc-600">
             {challenge.description}
           </p>
         </div>
 
-        <ChevronRight
-          className="text-zinc-500"
-          size={20}
-        />
+        <div className="w-8 h-8 rounded-xl border-2 border-black bg-white flex items-center justify-center flex-shrink-0 shadow-[1px_1px_0px_#000]">
+          <ChevronRight className="text-black" size={16} />
+        </div>
       </div>
 
-      {/* Status */}
-      <div
-        className={`mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${style.bg} ${style.text} ${style.border}`}
-      >
-        {challenge.status}
+      {/* Status Pill */}
+      <div className="mt-3">
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full border-2 border-black px-3 py-0.5 text-[11px] font-extrabold capitalize shadow-[1px_1px_0px_#000] ${style.bg} ${style.text}`}
+        >
+          {challenge.status}
+        </span>
       </div>
 
       {/* Progress */}
-      <div className="mt-6">
-        <ProgressBar
-          value={challenge.progress}
-          showPercentage={false}
-        />
+      <div className="mt-4">
+        <ProgressBar value={challenge.progress} showPercentage={false} />
       </div>
 
-      <div className="mt-2 flex justify-between text-xs text-zinc-400">
-        <span>{challenge.progress}% completed</span>
-
+      <div className="mt-2 flex justify-between text-[11px] font-bold text-zinc-600">
+        <span>{challenge.progress}% done</span>
         <span>
-          Day {challenge.currentDay} /{" "}
-          {challenge.duration}
+          Day {challenge.currentDay} / {challenge.duration}
         </span>
       </div>
 
       {/* Stats */}
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-black/30 p-3">
-          <div className="flex items-center gap-2 text-zinc-400">
-            <CheckCircle2 size={16} />
-            <span className="text-xs">
-              Completed
-            </span>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-2xl border-2 border-black bg-white p-2.5 shadow-[1px_1px_0px_#000]">
+          <div className="flex items-center gap-1.5 text-zinc-500">
+            <CheckCircle2 size={13} />
+            <span className="text-[10px] font-bold">Completed</span>
           </div>
-
-          <p className="mt-2 text-xl font-bold">
-            {challenge.completedDays}
+          <p className="mt-1 text-base font-black text-black">
+            {challenge.completedDays}d
           </p>
         </div>
 
-        <div className="rounded-2xl bg-black/30 p-3">
-          <div className="flex items-center gap-2 text-zinc-400">
-            <Clock3 size={16} />
-            <span className="text-xs">
-              Remaining
-            </span>
+        <div className="rounded-2xl border-2 border-black bg-white p-2.5 shadow-[1px_1px_0px_#000]">
+          <div className="flex items-center gap-2 text-zinc-500">
+            <Clock3 size={13} />
+            <span className="text-[10px] font-bold">Remaining</span>
           </div>
-
-          <p className="mt-2 text-xl font-bold">
-            {challenge.remainingDays}
+          <p className="mt-1 text-base font-black text-black">
+            {challenge.remainingDays}d
           </p>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="mt-6 flex items-center justify-between border-t border-zinc-800 pt-4">
-        <div className="flex items-center gap-2 text-zinc-500">
-          <Calendar size={15} />
-
-          <span className="text-xs">
-            {new Date(
-              challenge.startDate
-            ).toLocaleDateString()}
+      <div className="mt-4 flex items-center justify-between border-t-2 border-black/10 pt-3">
+        <div className="flex items-center gap-1.5 text-zinc-500">
+          <Calendar size={13} />
+          <span className="text-[10px] font-bold">
+            {new Date(challenge.startDate).toLocaleDateString()}
           </span>
         </div>
 
         {challenge.status === "active" && (
-          <div className="flex items-center gap-2 rounded-full bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-400">
-            <Trophy size={14} />
-            Active
-          </div>
-        )}
-
-        {challenge.status ===
-          "completed" && (
-          <div className="flex items-center gap-2 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-semibold text-sky-400">
-            <CheckCircle2 size={14} />
-            Completed
-          </div>
-        )}
-
-        {challenge.status === "failed" && (
-          <div className="flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-400">
-            <XCircle size={14} />
-            Failed
-          </div>
+          <span className="text-[10px] font-extrabold text-[#FF6B4A]">
+            Active Streak
+          </span>
         )}
       </div>
     </button>

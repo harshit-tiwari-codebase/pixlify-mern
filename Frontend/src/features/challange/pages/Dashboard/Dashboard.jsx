@@ -24,38 +24,37 @@ const Dashboard = () => {
   } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
-      <div className="mx-auto w-full max-w-screen-2xl px-4 py-5 sm:px-6 lg:px-8 xl:px-10">
+    <div className="min-h-screen bg-[#EBE6FB] text-black pb-28">
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-5 sm:px-6">
         {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 border-b border-zinc-800 pb-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
+        <div className="mb-6 flex flex-col gap-4 border-b-2 border-black pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 transition hover:border-violet-500"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border-2 border-black bg-white shadow-[2px_2px_0px_#000] hover:bg-zinc-50 active:scale-95 transition"
             >
               <ArrowLeft size={18} />
             </button>
 
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">
+              <h1 className="text-2xl font-extrabold tracking-tight text-black">
                 Dashboard
               </h1>
-
-              <p className="mt-1 text-sm text-zinc-500">
-                Track your challenge progress.
+              <p className="text-xs text-zinc-600 font-medium">
+                Track your challenge progress and streaks.
               </p>
             </div>
           </div>
 
-          <div className="hidden items-center gap-3 sm:flex">
-            <div className="rounded-full border border-zinc-800 px-4 py-2">
-              <span className="text-sm text-zinc-400">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full border-2 border-black bg-white px-4 py-1.5 shadow-[2px_2px_0px_#000]">
+              <span className="text-xs font-bold text-black">
                 {dashboard?.activeChallenges ?? 0} Active
               </span>
             </div>
 
-            <div className="rounded-full bg-violet-600 px-4 py-2">
-              <span className="text-sm font-medium">
+            <div className="rounded-full border-2 border-black bg-[#D5F94C] px-4 py-1.5 shadow-[2px_2px_0px_#000]">
+              <span className="text-xs font-bold text-black">
                 {dashboard?.completionRate ?? 0}% Complete
               </span>
             </div>
@@ -63,17 +62,16 @@ const Dashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="mb-8">
+        <div className="mb-6">
           <StatsCards dashboard={dashboard} />
         </div>
 
         {/* ========================= */}
         {/* Desktop */}
         {/* ========================= */}
-
-        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
+        <div className="hidden lg:grid lg:grid-cols-12 lg:gap-6 lg:items-start">
           {/* Left Sidebar */}
-          <aside className="lg:col-span-4 xl:col-span-3">
+          <aside className="lg:col-span-4 xl:col-span-4">
             <div className="sticky top-6">
               <ChallengeList
                 loading={loading}
@@ -85,7 +83,7 @@ const Dashboard = () => {
           </aside>
 
           {/* Right Content */}
-          <main className="min-w-0 lg:col-span-8 xl:col-span-9">
+          <main className="min-w-0 lg:col-span-8 xl:col-span-8">
             <ChallengeDetails
               challenge={challenge}
               progress={progress}
@@ -99,7 +97,6 @@ const Dashboard = () => {
         {/* ========================= */}
         {/* Mobile */}
         {/* ========================= */}
-
         <div className="lg:hidden">
           {!selectedChallenge ? (
             <ChallengeList
@@ -109,12 +106,12 @@ const Dashboard = () => {
               setSelectedChallenge={setSelectedChallenge}
             />
           ) : (
-            <div className="animate-in fade-in slide-in-from-right-5 duration-300">
+            <div>
               <button
                 onClick={() => setSelectedChallenge(null)}
-                className="mb-5 flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 transition hover:border-violet-500"
+                className="mb-4 flex items-center gap-2 rounded-full border-2 border-black bg-white px-4 py-2 text-xs font-bold shadow-[2px_2px_0px_#000]"
               >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={16} />
                 Back to Challenges
               </button>
 

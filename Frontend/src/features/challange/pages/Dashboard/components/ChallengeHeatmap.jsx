@@ -2,71 +2,59 @@ import React from "react";
 import { CalendarDays } from "lucide-react";
 
 const colors = {
-  completed: "bg-green-500",
-  missed: "bg-red-500",
-  today: "bg-violet-500 ring-1 ring-violet-400",
-  future: "bg-zinc-800",
+  completed: "bg-[#D5F94C] text-black",
+  missed: "bg-[#FFAEC0] text-black",
+  today: "bg-[#FF6B4A] text-white",
+  future: "bg-[#EBE6FB] text-zinc-600",
 };
 
 const legends = [
   {
     label: "Completed",
-    color: "bg-green-500",
+    color: "bg-[#D5F94C]",
   },
   {
     label: "Missed",
-    color: "bg-red-500",
+    color: "bg-[#FFAEC0]",
   },
   {
     label: "Today",
-    color: "bg-violet-500",
+    color: "bg-[#FF6B4A]",
   },
   {
     label: "Future",
-    color: "bg-zinc-800",
+    color: "bg-[#EBE6FB]",
   },
 ];
 
-const ChallengeHeatmap = ({
-  challenge,
-  heatmap = [],
-}) => {
+const ChallengeHeatmap = ({ challenge, heatmap = [] }) => {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+    <div className="rounded-[32px] border-[2.5px] border-black bg-white p-5 sm:p-6 shadow-[4px_4px_0px_#000]">
       {/* Header */}
-
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-violet-500/10 p-2">
-            <CalendarDays
-              size={18}
-              className="text-violet-400"
-            />
+          <div className="rounded-2xl border-2 border-black bg-[#A0E7D4] p-2 shadow-[2px_2px_0px_#000]">
+            <CalendarDays size={18} className="text-black stroke-[2.5]" />
           </div>
 
           <div>
-            <h2 className="font-semibold">
-              Challenge Heatmap
+            <h2 className="text-base font-extrabold text-black">
+              Consistency Heatmap
             </h2>
-
-            <p className="text-xs text-zinc-500">
-              Daily consistency tracker
+            <p className="text-xs font-semibold text-zinc-600">
+              Daily habit tracker
             </p>
           </div>
         </div>
 
-        <span className="text-sm text-zinc-400">
-          {heatmap.filter(
-            (d) => d.status === "completed"
-          ).length}
-          /{challenge.duration}
+        <span className="rounded-full border-2 border-black bg-[#D5F94C] px-3 py-0.5 text-xs font-extrabold text-black shadow-[1px_1px_0px_#000]">
+          {heatmap.filter((d) => d.status === "completed").length}/{challenge.duration}
         </span>
       </div>
 
-      {/* Heatmap */}
-
-      <div className="mt-6 overflow-x-auto">
-        <div className="grid min-w-max grid-cols-7 gap-2">
+      {/* Heatmap Grid */}
+      <div className="mt-5 overflow-x-auto pb-2">
+        <div className="grid min-w-max grid-cols-7 gap-2.5">
           {heatmap.map((day) => (
             <div
               key={day.day}
@@ -75,97 +63,66 @@ const ChallengeHeatmap = ({
             >
               <div
                 className={`
-                  h-6
-                  w-6
-                  rounded-md
-                  border
-                  border-zinc-700/70
+                  h-7
+                  w-7
+                  rounded-xl
+                  border-2
+                  border-black
+                  shadow-[1px_1px_0px_#000]
+                  flex
+                  items-center
+                  justify-center
+                  text-[10px]
+                  font-extrabold
                   transition
-                  duration-200
                   hover:scale-110
-                  ${colors[day.status]}
+                  ${colors[day.status] || colors.future}
                 `}
-              />
-
-              <span className="mt-1 text-[10px] text-zinc-500">
+              >
                 {day.day}
-              </span>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Legend */}
-
-      <div className="mt-5 flex flex-wrap items-center gap-4 text-xs text-zinc-500">
+      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs font-bold text-zinc-600 border-t-2 border-black/10 pt-3">
         {legends.map((item) => (
-          <div
-            key={item.label}
-            className="flex items-center gap-2"
-          >
+          <div key={item.label} className="flex items-center gap-1.5">
             <div
-              className={`h-3 w-3 rounded ${item.color}`}
+              className={`h-3 w-3 rounded-md border border-black ${item.color}`}
             />
-
             <span>{item.label}</span>
           </div>
         ))}
       </div>
 
-      {/* Summary */}
+      {/* Summary Row */}
+      <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="rounded-2xl border-2 border-black bg-white p-3 shadow-[2px_2px_0px_#000]">
+          <p className="text-[10px] font-bold text-zinc-500 uppercase">Duration</p>
+          <h3 className="mt-0.5 text-lg font-black text-black">{challenge.duration}d</h3>
+        </div>
 
-      <div className="mt-6 grid grid-cols-4 gap-3">
-        <div className="rounded-xl bg-black/30 p-3">
-          <p className="text-[11px] text-zinc-500">
-            Duration
-          </p>
-
-          <h3 className="mt-1 text-lg font-semibold">
-            {challenge.duration}
+        <div className="rounded-2xl border-2 border-black bg-[#D5F94C]/40 p-3 shadow-[2px_2px_0px_#000]">
+          <p className="text-[10px] font-bold text-zinc-600 uppercase">Completed</p>
+          <h3 className="mt-0.5 text-lg font-black text-black">
+            {heatmap.filter((d) => d.status === "completed").length}
           </h3>
         </div>
 
-        <div className="rounded-xl bg-black/30 p-3">
-          <p className="text-[11px] text-zinc-500">
-            Completed
-          </p>
-
-          <h3 className="mt-1 text-lg font-semibold text-green-400">
-            {
-              heatmap.filter(
-                (d) => d.status === "completed"
-              ).length
-            }
+        <div className="rounded-2xl border-2 border-black bg-[#FFAEC0]/40 p-3 shadow-[2px_2px_0px_#000]">
+          <p className="text-[10px] font-bold text-zinc-600 uppercase">Missed</p>
+          <h3 className="mt-0.5 text-lg font-black text-black">
+            {heatmap.filter((d) => d.status === "missed").length}
           </h3>
         </div>
 
-        <div className="rounded-xl bg-black/30 p-3">
-          <p className="text-[11px] text-zinc-500">
-            Missed
-          </p>
-
-          <h3 className="mt-1 text-lg font-semibold text-red-400">
-            {
-              heatmap.filter(
-                (d) => d.status === "missed"
-              ).length
-            }
-          </h3>
-        </div>
-
-        <div className="rounded-xl bg-black/30 p-3">
-          <p className="text-[11px] text-zinc-500">
-            Remaining
-          </p>
-
-          <h3 className="mt-1 text-lg font-semibold text-violet-400">
-            {
-              heatmap.filter(
-                (d) =>
-                  d.status === "future" ||
-                  d.status === "today"
-              ).length
-            }
+        <div className="rounded-2xl border-2 border-black bg-[#FED7A5]/40 p-3 shadow-[2px_2px_0px_#000]">
+          <p className="text-[10px] font-bold text-zinc-600 uppercase">Remaining</p>
+          <h3 className="mt-0.5 text-lg font-black text-black">
+            {heatmap.filter((d) => d.status === "future" || d.status === "today").length}
           </h3>
         </div>
       </div>

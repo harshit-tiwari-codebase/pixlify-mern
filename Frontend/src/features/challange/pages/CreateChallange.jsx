@@ -1,26 +1,23 @@
 import ChallengeHeader from "../components/ChallengeHeader";
 import ChallengeForm from "../components/ChallengeForm";
 import useCreateChallenge from "../hooks/useCreateChallenge";
+import BottomNavbar from "../../post/components/BottomNavbar";
 
 const CreateChallenge = () => {
   const { loading, createNewChallenge } = useCreateChallenge();
 
-  console.log("CreateChallenge Rendered");
-  console.log({
-    loading,
-    createNewChallenge,
-  });
-
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#EBE6FB] text-black pb-28">
       <ChallengeHeader />
 
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main className="mx-auto max-w-xl px-4 py-6">
         <ChallengeForm
           loading={loading}
           onSubmit={createNewChallenge}
         />
       </main>
+
+      <BottomNavbar />
     </div>
   );
 };

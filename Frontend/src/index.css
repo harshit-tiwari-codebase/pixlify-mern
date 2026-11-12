@@ -1,7 +1,58 @@
 @import "tailwindcss";
 
+:root {
+  --bg-canvas: #EBE6FB;
+  --color-coral: #FF6B4A;
+  --color-lime: #D5F94C;
+  --color-mint: #A0E7D4;
+  --color-lavender: #BFB9FA;
+  --color-pink: #FFAEC0;
+  --color-peach: #FED7A5;
+  --color-dark: #13141F;
+}
+
 html,
 body,
 #root {
-  font-family: "Inter", sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #EBE6FB;
+}
+
+/* Custom scrollbars matching the pastel neo-brutalist aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #EBE6FB;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 9999px;
+}
+
+/* Neo-brutalist buttons & cards */
+.neo-border {
+  border: 2.5px solid #000000;
+}
+
+.neo-border-thin {
+  border: 2px solid #000000;
+}
+
+.neo-shadow {
+  box-shadow: 2px 2px 0px #000000;
+}
+
+.neo-shadow-lg {
+  box-shadow: 4px 4px 0px #000000;
+}
+
+/* Hide scrollbars for clean story rows */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

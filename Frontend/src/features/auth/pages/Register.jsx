@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 
@@ -8,7 +7,7 @@ const Register = () => {
   const [email, setemail] = useState("");
   const [username, setusername] = useState("");
   const [password, setpassword] = useState("");
-  const { handleRegister , loading } = useAuth();
+  const { handleRegister, loading } = useAuth();
 
   const navigate = useNavigate();
 
@@ -16,12 +15,11 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await handleRegister(username, email, password)
-      toast.success("Account is created Successfully")
+      await handleRegister(username, email, password);
+      toast.success("Account created successfully!");
       setTimeout(() => {
-         navigate("/login")
-      }, 1000);
-      console.log(response);
+        navigate("/login");
+      }, 800);
     } catch (error) {
       toast.error(
         error.response?.data?.message || error.message || "Register failed"
@@ -29,67 +27,81 @@ const Register = () => {
     }
   }
 
-    
-
-
   return (
-    <div className="w-full min-h-screen bg-black text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold text-center mb-2">
-          Create Account
-        </h1>
+    <div className="w-full min-h-screen bg-[#EBE6FB] text-black flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-md bg-white border-[2.5px] border-black rounded-[32px] p-6 sm:p-8 shadow-[5px_5px_0px_#000]">
+        {/* Brand */}
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-extrabold tracking-tight text-black inline-block mb-1">
+            pixlify<span className="text-[#FF6B4A]">.</span>
+          </h2>
+          <h1 className="text-xl font-extrabold text-black mt-2">
+            Create Account
+          </h1>
+          <p className="text-xs text-zinc-600 font-medium mt-1">
+            Join the community and start sharing your moments.
+          </p>
+        </div>
 
-        <p className="text-zinc-400 text-center mb-8">
-          Join Pixlify and start sharing your moments
-        </p>
+        <form onSubmit={registerHandler} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-xs font-bold text-black mb-1.5">
+              Email
+            </label>
+            <input
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+              placeholder="you@domain.com"
+              required
+              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 border-2 border-black text-black text-sm placeholder-zinc-500 outline-none focus:shadow-[2px_2px_0px_#000] transition"
+            />
+          </div>
 
-        <form onSubmit={registerHandler} className="flex flex-col gap-5">
-          <input
-            type="text"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => {
-              setemail(e.target.value);
-            }}
-            placeholder="Email"
-            required={true}
-            className="w-full px-4 py-3 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 outline-none focus:border-blue-500 transition"
-          />
+          <div>
+            <label className="block text-xs font-bold text-black mb-1.5">
+              Username
+            </label>
+            <input
+              type="text"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setusername(e.target.value)}
+              placeholder="Choose a username"
+              required
+              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 border-2 border-black text-black text-sm placeholder-zinc-500 outline-none focus:shadow-[2px_2px_0px_#000] transition"
+            />
+          </div>
 
-          <input
-            type="text"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => {
-              setusername(e.target.value);
-            }}
-            placeholder="Username"
-            className="w-full px-4 py-3 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 outline-none focus:border-blue-500 transition"
-          />
+          <div>
+            <label className="block text-xs font-bold text-black mb-1.5">
+              Password
+            </label>
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setpassword(e.target.value)}
+              placeholder="Min 6 characters"
+              required
+              className="w-full px-4 py-3 rounded-2xl bg-zinc-50 border-2 border-black text-black text-sm placeholder-zinc-500 outline-none focus:shadow-[2px_2px_0px_#000] transition"
+            />
+          </div>
 
-          <input
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => {
-              setpassword(e.target.value);
-            }}
-            placeholder="Password"
-            className="w-full px-4 py-3 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 outline-none focus:border-blue-500 transition"
-          />
-
-           <button
+          <button
             type="submit"
-            disabled={loading}
-            className="mt-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-300 disabled:opacity-50"
+            disabled={loading || !username || !email || !password}
+            className="mt-2 py-3.5 rounded-full bg-[#FF6B4A] hover:bg-[#ff5a36] disabled:opacity-50 text-white font-extrabold text-xs uppercase tracking-wider border-2 border-black transition shadow-[3px_3px_0px_#000] active:scale-95"
           >
-          {loading ? "Registering..." : "Register"}
+            {loading ? "Registering..." : "Join Pixlify"}
           </button>
         </form>
-        <p className="text-zinc-400 text-center mt-6">
-          Alreay have an Account{" "}
-          <Link className="text-blue-400 hover:text-blue-300" to={"/login"}>
-            Login
+
+        <p className="text-xs text-zinc-600 text-center mt-6 font-semibold">
+          Already have an account?{" "}
+          <Link className="text-black font-extrabold underline hover:text-[#FF6B4A]" to="/login">
+            Sign in
           </Link>
         </p>
       </div>

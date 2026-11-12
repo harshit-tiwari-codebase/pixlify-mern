@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Plus,
+  Heart,
+  Send,
   Search,
   X,
   User,
   LogOut,
   Trophy,
   LayoutDashboard,
-  Compass,
+  Plus,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";
@@ -93,22 +94,22 @@ const Navbar = () => {
     user?.profile_img ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(
       user?.user || user?.username || "User"
-    )}&background=8b5cf6&color=fff`;
+    )}&background=FFAEC0&color=000&bold=true`;
 
   return (
-    <div className="w-full bg-black/90 backdrop-blur-xl border-b border-zinc-800/80 sticky top-0 z-50">
-      <nav className="w-full max-w-5xl mx-auto h-16 px-4 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link to="/feed" className="flex items-center gap-2 group flex-shrink-0">
-          <h1 className="text-2xl font-black italic tracking-wide bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent group-hover:opacity-90 transition">
-            Pixlify
-          </h1>
+    <header className="w-full bg-[#EBE6FB]/95 backdrop-blur-md sticky top-0 z-40 transition-colors">
+      <div className="w-full max-w-xl lg:max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        {/* Brand: "pixlify." with a coral dot */}
+        <Link to="/feed" className="flex items-center gap-1 group flex-shrink-0 select-none">
+          <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black transition-transform group-hover:scale-105">
+            pixlify<span className="text-[#FF6B4A]">.</span>
+          </span>
         </Link>
 
-        {/* Desktop / Tablet Search */}
-        <div ref={searchRef} className="hidden sm:block flex-1 max-w-sm relative">
+        {/* Search Bar */}
+        <div ref={searchRef} className="hidden sm:block flex-1 max-w-xs relative">
           <div className="relative flex items-center">
-            <Search className="absolute left-3 w-4 h-4 text-zinc-500 pointer-events-none" />
+            <Search className="absolute left-3.5 w-4 h-4 text-zinc-500 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -116,8 +117,8 @@ const Navbar = () => {
               onFocus={() => {
                 if (searchResults.length > 0) setShowSearchDropdown(true);
               }}
-              placeholder="Search users..."
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 pl-9 pr-9 py-2 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-violet-500 focus:bg-zinc-900"
+              placeholder="Search people, places, vibes"
+              className="w-full rounded-2xl border-2 border-black bg-white pl-10 pr-9 py-2 text-xs sm:text-sm text-black placeholder:text-zinc-500 outline-none transition focus:shadow-[2px_2px_0px_#000]"
             />
             {searchQuery && (
               <button
@@ -125,7 +126,7 @@ const Navbar = () => {
                   setSearchQuery("");
                   setSearchResults([]);
                 }}
-                className="absolute right-3 text-zinc-400 hover:text-white"
+                className="absolute right-3 text-zinc-400 hover:text-black"
               >
                 <X size={15} />
               </button>
@@ -134,22 +135,22 @@ const Navbar = () => {
 
           {/* Search Dropdown */}
           {showSearchDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-zinc-800 bg-zinc-900/95 shadow-2xl backdrop-blur-lg overflow-hidden z-50 max-h-80 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl border-2 border-black bg-white shadow-[4px_4px_0px_#000] overflow-hidden z-50 max-h-80 overflow-y-auto">
               {searching ? (
-                <div className="p-4 text-center text-xs text-zinc-400">
-                  Searching...
+                <div className="p-4 text-center text-xs text-zinc-500">
+                  Searching people...
                 </div>
               ) : searchResults.length === 0 ? (
                 <div className="p-4 text-center text-xs text-zinc-500">
-                  No users found for "{searchQuery}"
+                  No people found for "{searchQuery}"
                 </div>
               ) : (
-                <div className="py-2 divide-y divide-zinc-800/50">
+                <div className="py-1 divide-y divide-zinc-200">
                   {searchResults.map((item) => (
                     <div
                       key={item._id}
                       onClick={() => handleSelectUser(item.username)}
-                      className="px-4 py-2.5 flex items-center justify-between hover:bg-zinc-800/60 cursor-pointer transition"
+                      className="px-4 py-2.5 flex items-center justify-between hover:bg-[#EBE6FB] cursor-pointer transition"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <img
@@ -157,24 +158,24 @@ const Navbar = () => {
                             item.profile_img ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(
                               item.username
-                            )}&background=6366f1&color=fff`
+                            )}&background=A0E7D4&color=000&bold=true`
                           }
                           alt={item.username}
-                          className="w-9 h-9 rounded-full object-cover border border-zinc-700 flex-shrink-0"
+                          className="w-9 h-9 rounded-xl object-cover border-2 border-black flex-shrink-0"
                         />
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">
+                          <p className="text-sm font-bold text-black truncate">
                             {item.username}
                           </p>
                           {item.bio && (
-                            <p className="text-xs text-zinc-400 truncate max-w-[200px]">
+                            <p className="text-xs text-zinc-600 truncate max-w-[180px]">
                               {item.bio}
                             </p>
                           )}
                         </div>
                       </div>
 
-                      <span className="text-xs text-violet-400 font-medium ml-2">
+                      <span className="text-xs font-bold text-[#FF6B4A]">
                         View
                       </span>
                     </div>
@@ -185,122 +186,115 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          {/* Mobile search toggle */}
+        {/* Right Action Buttons: Heart & Direct Message Squircles */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Mobile Search Toggle */}
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
-            className="sm:hidden p-2 text-zinc-300 hover:text-white rounded-lg hover:bg-zinc-900 transition"
+            className="sm:hidden w-10 h-10 rounded-2xl border-2 border-black bg-white flex items-center justify-center text-black hover:bg-zinc-50 transition active:scale-95 shadow-[2px_2px_0px_#000]"
             aria-label="Search"
           >
-            <Search size={20} />
+            <Search size={18} />
           </button>
 
-          {/* Create Post */}
+          {/* Heart Notification Button */}
           <Link
-            to="/createPost"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-95 transition shadow-sm hover:scale-[1.02]"
+            to="/follower"
+            className="w-10 h-10 rounded-2xl border-2 border-black bg-white flex items-center justify-center text-black hover:bg-zinc-50 transition active:scale-95 shadow-[2px_2px_0px_#000]"
+            title="Activity"
           >
-            <Plus size={17} />
-            <span className="hidden sm:inline">Create</span>
+            <Heart size={19} className="stroke-[2.2]" />
           </Link>
 
-          {/* Quick links on desktop */}
-          <Link
-            to="/challangeFeed"
-            className="hidden md:flex p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition"
-            title="Challenges"
+          {/* Direct Message / Send Button */}
+          <button
+            onClick={() => toast("Direct Messages coming soon!")}
+            className="w-10 h-10 rounded-2xl border-2 border-black bg-white flex items-center justify-center text-black hover:bg-zinc-50 transition active:scale-95 shadow-[2px_2px_0px_#000]"
+            title="Messages"
           >
-            <Trophy size={20} />
-          </Link>
+            <Send size={18} className="stroke-[2.2]" />
+          </button>
 
-          <Link
-            to="/dashboard"
-            className="hidden md:flex p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition"
-            title="Dashboard"
-          >
-            <LayoutDashboard size={20} />
-          </Link>
-
-          {/* Profile Menu Dropdown */}
+          {/* User Profile Menu Avatar */}
           <div ref={profileMenuRef} className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="h-9 w-9 rounded-full overflow-hidden ring-2 ring-violet-500/40 hover:ring-violet-500 transition block focus:outline-none"
+              className="w-10 h-10 rounded-2xl border-2 border-black overflow-hidden bg-white shadow-[2px_2px_0px_#000] active:scale-95 transition block focus:outline-none"
+              aria-label="User profile menu"
             >
               <img
                 src={avatarSrc}
                 alt="Profile"
-                className="h-full w-full object-cover"
+                className="w-full h-full object-cover"
               />
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-52 rounded-xl border border-zinc-800 bg-zinc-950 p-1.5 shadow-2xl backdrop-blur-xl z-50">
-                <div className="px-3 py-2 border-b border-zinc-800/80 mb-1">
-                  <p className="text-xs text-zinc-400">Signed in as</p>
-                  <p className="text-sm font-semibold text-white truncate">
-                    {user?.username || "Pixlify User"}
+              <div className="absolute right-0 mt-2 w-52 rounded-2xl border-2 border-black bg-white p-2 shadow-[4px_4px_0px_#000] z-50">
+                <div className="px-3 py-2 border-b-2 border-black/10 mb-1">
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase">Signed in as</p>
+                  <p className="text-sm font-bold text-black truncate">
+                    @{user?.username || "user"}
                   </p>
                 </div>
 
                 <Link
                   to="/myProfile"
                   onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-900 transition"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-black hover:bg-[#EBE6FB] transition"
                 >
-                  <User size={16} />
+                  <User size={15} />
                   <span>My Profile</span>
                 </Link>
 
                 <Link
                   to="/challangeFeed"
                   onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-900 transition"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-black hover:bg-[#EBE6FB] transition"
                 >
-                  <Trophy size={16} />
+                  <Trophy size={15} className="text-[#FF6B4A]" />
                   <span>Challenges</span>
                 </Link>
 
                 <Link
                   to="/dashboard"
                   onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-900 transition"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-black hover:bg-[#EBE6FB] transition"
                 >
-                  <LayoutDashboard size={16} />
+                  <LayoutDashboard size={15} />
                   <span>Dashboard</span>
                 </Link>
 
-                <div className="border-t border-zinc-800/80 my-1" />
+                <div className="border-t-2 border-black/10 my-1" />
 
                 <button
                   onClick={() => {
                     setShowProfileMenu(false);
                     onLogout();
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition text-left"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition text-left"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={15} />
                   <span>Log Out</span>
                 </button>
               </div>
             )}
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile Search Bar Expansion */}
+      {/* Mobile Search Input */}
       {showMobileSearch && (
-        <div className="sm:hidden px-4 pb-3 pt-1 border-t border-zinc-800/50 bg-black/95">
+        <div className="sm:hidden px-4 pb-3 pt-1">
           <div className="relative flex items-center">
-            <Search className="absolute left-3 w-4 h-4 text-zinc-500" />
+            <Search className="absolute left-3.5 w-4 h-4 text-zinc-500" />
             <input
               type="text"
               autoFocus
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search users..."
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900 pl-9 pr-9 py-2 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-violet-500"
+              placeholder="Search people, places, vibes"
+              className="w-full rounded-2xl border-2 border-black bg-white pl-10 pr-9 py-2 text-xs text-black placeholder:text-zinc-500 outline-none shadow-[2px_2px_0px_#000]"
             />
             {searchQuery && (
               <button
@@ -310,27 +304,27 @@ const Navbar = () => {
                 }}
                 className="absolute right-3 text-zinc-400"
               >
-                <X size={16} />
+                <X size={15} />
               </button>
             )}
           </div>
 
           {searchQuery && (
-            <div className="mt-2 rounded-xl border border-zinc-800 bg-zinc-900/95 max-h-60 overflow-y-auto divide-y divide-zinc-800/60">
+            <div className="mt-2 rounded-2xl border-2 border-black bg-white max-h-60 overflow-y-auto divide-y divide-zinc-200 shadow-[3px_3px_0px_#000]">
               {searching ? (
-                <div className="p-3 text-center text-xs text-zinc-400">
-                  Searching...
+                <div className="p-3 text-center text-xs text-zinc-500">
+                  Searching people...
                 </div>
               ) : searchResults.length === 0 ? (
                 <div className="p-3 text-center text-xs text-zinc-500">
-                  No users found
+                  No people found
                 </div>
               ) : (
                 searchResults.map((item) => (
                   <div
                     key={item._id}
                     onClick={() => handleSelectUser(item.username)}
-                    className="px-3 py-2.5 flex items-center justify-between hover:bg-zinc-800"
+                    className="px-3 py-2.5 flex items-center justify-between hover:bg-[#EBE6FB]"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <img
@@ -338,23 +332,23 @@ const Navbar = () => {
                           item.profile_img ||
                           `https://ui-avatars.com/api/?name=${encodeURIComponent(
                             item.username
-                          )}&background=6366f1&color=fff`
+                          )}&background=FFAEC0&color=000&bold=true`
                         }
                         alt=""
-                        className="w-8 h-8 rounded-full object-cover"
+                        className="w-8 h-8 rounded-xl object-cover border-2 border-black"
                       />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-xs font-bold text-black truncate">
                           {item.username}
                         </p>
                         {item.bio && (
-                          <p className="text-xs text-zinc-400 truncate max-w-[180px]">
+                          <p className="text-[11px] text-zinc-500 truncate max-w-[180px]">
                             {item.bio}
                           </p>
                         )}
                       </div>
                     </div>
-                    <span className="text-xs text-violet-400">View</span>
+                    <span className="text-xs font-bold text-[#FF6B4A]">View</span>
                   </div>
                 ))
               )}
@@ -362,7 +356,7 @@ const Navbar = () => {
           )}
         </div>
       )}
-    </div>
+    </header>
   );
 };
 

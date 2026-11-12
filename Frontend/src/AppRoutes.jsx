@@ -5,6 +5,7 @@ import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
 
 import Feed from "./features/post/Pages/Feed";
+import Explore from "./features/post/Pages/Explore";
 import CreatePost from "./features/post/Pages/CreatePost";
 import MyProfile from "./features/post/Pages/MyProfile";
 import UserProfile from "./features/post/Pages/UserProfile";
@@ -33,6 +34,8 @@ const AppRoutes = () => {
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/feed" element={<Feed />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/search" element={<Explore />} />
           <Route path="/createPost" element={<CreatePost />} />
           <Route path="/myProfile" element={<MyProfile />} />
           <Route path="/profile/:username" element={<UserProfile />} />

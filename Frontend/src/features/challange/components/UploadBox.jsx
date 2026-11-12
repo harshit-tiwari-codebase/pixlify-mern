@@ -1,26 +1,17 @@
-import { useRef } from "react";
-import {
-  UploadCloud,
-  Image as ImageIcon,
-} from "lucide-react";
+import React, { useRef } from "react";
+import { UploadCloud, Image as ImageIcon } from "lucide-react";
 
-const UploadBox = ({
-  image,
-  setImage,
-}) => {
+const UploadBox = ({ image, setImage }) => {
   const inputRef = useRef();
 
   const handleImage = (e) => {
     const file = e.target.files[0];
-
     if (!file) return;
-
     setImage(file);
   };
 
   return (
     <div>
-
       <input
         type="file"
         hidden
@@ -32,64 +23,42 @@ const UploadBox = ({
       {image ? (
         <div
           onClick={() => inputRef.current.click()}
-          className="
-            cursor-pointer
-            overflow-hidden
-            rounded-3xl
-            border
-            border-zinc-800
-          "
+          className="cursor-pointer overflow-hidden rounded-[28px] border-2 border-black shadow-[3px_3px_0px_#000] relative group"
         >
           <img
             src={URL.createObjectURL(image)}
-            alt=""
-            className="h-72 w-full object-cover"
+            alt="Upload proof"
+            className="h-64 w-full object-cover"
           />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+            <span className="rounded-full bg-white border-2 border-black px-4 py-1.5 text-xs font-bold text-black shadow-[2px_2px_0px_#000]">
+              Change Image
+            </span>
+          </div>
         </div>
       ) : (
         <div
           onClick={() => inputRef.current.click()}
-          className="
-            flex
-            h-72
-            cursor-pointer
-            flex-col
-            items-center
-            justify-center
-            rounded-3xl
-            border-2
-            border-dashed
-            border-zinc-700
-            bg-black
-            transition-all
-            duration-300
-            hover:border-violet-500
-            hover:bg-zinc-950
-          "
+          className="flex h-64 cursor-pointer flex-col items-center justify-center rounded-[28px] border-2 border-dashed border-black bg-white hover:bg-[#EBE6FB]/40 transition shadow-[3px_3px_0px_#000]"
         >
-          <div className="rounded-full bg-violet-500/10 p-5">
-            <UploadCloud
-              size={42}
-              className="text-violet-400"
-            />
+          <div className="rounded-2xl border-2 border-black bg-[#FED7A5] p-3.5 shadow-[2px_2px_0px_#000]">
+            <UploadCloud size={28} className="text-black stroke-[2.5]" />
           </div>
 
-          <h3 className="mt-6 text-xl font-semibold">
-            Upload Proof
+          <h3 className="mt-4 text-sm font-extrabold text-black">
+            Upload Progress Photo
           </h3>
 
-          <p className="mt-2 text-sm text-zinc-500">
-            PNG, JPG or JPEG (Max 5MB)
+          <p className="mt-1 text-xs font-semibold text-zinc-500">
+            PNG, JPG or WEBP (Max 5MB)
           </p>
 
-          <button className="mt-7 flex items-center gap-2 rounded-xl border border-zinc-700 px-5 py-3 transition hover:border-violet-500">
-            <ImageIcon size={18} />
-
-            Browse Image
-          </button>
+          <span className="mt-4 inline-flex items-center gap-2 rounded-xl border-2 border-black bg-white px-4 py-2 text-xs font-bold text-black shadow-[2px_2px_0px_#000]">
+            <ImageIcon size={14} />
+            Browse File
+          </span>
         </div>
       )}
-
     </div>
   );
 };

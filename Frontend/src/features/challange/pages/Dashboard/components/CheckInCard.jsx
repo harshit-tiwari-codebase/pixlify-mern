@@ -1,14 +1,7 @@
 import React, { useRef, useState } from "react";
-import {
-  Camera,
-  CheckCircle2,
-  ImagePlus,
-} from "lucide-react";
+import { Camera, CheckCircle2, ImagePlus } from "lucide-react";
 
-const CheckInCard = ({
-  progress,
-  onCheckIn,
-}) => {
+const CheckInCard = ({ progress, onCheckIn }) => {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState(null);
 
@@ -32,20 +25,17 @@ const CheckInCard = ({
 
   if (progress?.checkedInToday) {
     return (
-      <div className="rounded-3xl border border-green-500/20 bg-green-500/5 p-6">
-        <div className="flex flex-col items-center justify-center text-center">
-          <div className="rounded-full bg-green-500/10 p-4">
-            <CheckCircle2
-              className="text-green-400"
-              size={40}
-            />
+      <div className="rounded-[32px] border-[2.5px] border-black bg-white p-6 shadow-[4px_4px_0px_#000]">
+        <div className="flex flex-col items-center justify-center text-center py-4">
+          <div className="rounded-2xl border-2 border-black bg-[#D5F94C] p-4 shadow-[2px_2px_0px_#000]">
+            <CheckCircle2 className="text-black" size={36} />
           </div>
 
-          <h2 className="mt-5 text-2xl font-bold">
+          <h2 className="mt-4 text-xl font-extrabold text-black">
             Check-in Completed 🎉
           </h2>
 
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-1 text-xs font-semibold text-zinc-600 max-w-xs">
             Great work! Come back tomorrow and continue your streak.
           </p>
         </div>
@@ -54,51 +44,43 @@ const CheckInCard = ({
   }
 
   return (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+    <div className="rounded-[32px] border-[2.5px] border-black bg-white p-6 shadow-[4px_4px_0px_#000]">
       {/* Header */}
-
       <div className="flex items-center gap-3">
-        <div className="rounded-xl bg-violet-500/10 p-3">
-          <Camera
-            className="text-violet-400"
-            size={22}
-          />
+        <div className="rounded-2xl border-2 border-black bg-[#FED7A5] p-2.5 shadow-[2px_2px_0px_#000]">
+          <Camera className="text-black" size={20} />
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-base font-extrabold text-black">
             Today's Check-in
           </h2>
-
-          <p className="text-sm text-zinc-500">
+          <p className="text-xs font-semibold text-zinc-600">
             Upload proof for today's progress.
           </p>
         </div>
       </div>
 
-      {/* Upload */}
-
+      {/* Upload Box */}
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="mt-8 flex h-56 cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-zinc-700 bg-black/20 transition hover:border-violet-500"
+        className="mt-5 flex h-48 cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-black bg-[#EBE6FB]/30 hover:bg-[#EBE6FB]/60 transition overflow-hidden"
       >
         {image ? (
           <img
             src={URL.createObjectURL(image)}
             alt="Preview"
-            className="h-full w-full rounded-3xl object-cover"
+            className="h-full w-full object-cover"
           />
         ) : (
-          <>
-            <ImagePlus
-              className="text-zinc-500"
-              size={42}
-            />
-
-            <p className="mt-3 text-sm text-zinc-400">
-              Click to upload image
+          <div className="text-center p-4">
+            <div className="w-10 h-10 rounded-xl border-2 border-black bg-white flex items-center justify-center mx-auto shadow-[1px_1px_0px_#000]">
+              <ImagePlus className="text-black" size={20} />
+            </div>
+            <p className="mt-2 text-xs font-bold text-black">
+              Click to select proof photo
             </p>
-          </>
+          </div>
         )}
       </div>
 
@@ -109,7 +91,6 @@ const CheckInCard = ({
         accept="image/*"
         onChange={(e) => {
           const file = e.target.files?.[0];
-
           if (file) {
             setImage(file);
           }
@@ -117,21 +98,19 @@ const CheckInCard = ({
       />
 
       {/* Caption */}
-
       <textarea
-        rows={4}
+        rows={3}
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
         placeholder="How was today's challenge?"
-        className="mt-6 w-full rounded-2xl border border-zinc-800 bg-black p-4 text-sm outline-none transition focus:border-violet-500"
+        className="mt-4 w-full rounded-2xl border-2 border-black bg-white p-3 text-xs font-bold text-black placeholder:text-zinc-400 outline-none shadow-[2px_2px_0px_#000]"
       />
 
       {/* Button */}
-
       <button
         disabled={!image}
         onClick={handleSubmit}
-        className="mt-6 w-full rounded-2xl bg-violet-600 py-4 font-semibold transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-4 w-full rounded-2xl border-2 border-black bg-[#FF6B4A] hover:bg-[#ff5a36] py-3 text-xs font-extrabold text-white shadow-[3px_3px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Submit Check-in
       </button>

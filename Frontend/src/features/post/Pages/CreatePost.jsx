@@ -7,6 +7,7 @@ import {
   Hash,
   MapPin,
   Image as ImageIcon,
+  Sparkles,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNavbar from "../components/BottomNavbar";
@@ -18,7 +19,7 @@ const CreatePost = () => {
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
   const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState(["vibe"]);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const CreatePost = () => {
   async function submitHandler(e) {
     e.preventDefault();
     if (!image) {
-      toast.error("Please select an image");
+      toast.error("Please select a photo");
       return;
     }
     if (!caption.trim()) {
@@ -65,44 +66,50 @@ const CreatePost = () => {
       await handleCreatePost(caption.trim(), image, tags, location.trim());
       setCaption("");
       setImage(null);
-      setTags([]);
+      setTags(["vibe"]);
       setLocation("");
+      toast.success("Post shared!");
       navigate("/feed");
     } catch (err) {
       console.error(err);
+      toast.error("Failed to share post");
     } finally {
       setLoading(false);
     }
   }
 
+  const suggestedTags = ["golden hour", "vibes", "street food", "travel", "tiny homes", "cycling"];
+
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-black text-white pb-24">
-      <div className="w-full max-w-4xl px-4 sm:px-6">
+    <div className="w-full min-h-screen flex flex-col items-center bg-[#EBE6FB] text-black pb-28">
+      <div className="w-full max-w-md sm:max-w-lg px-4 pt-4">
         {/* Header */}
-        <header className="w-full h-16 flex items-center justify-between border-b border-zinc-800/80 mb-6">
+        <header className="w-full h-16 flex items-center justify-between border-b-2 border-black mb-6">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition"
+              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white border-2 border-black shadow-[2px_2px_0px_#000] hover:bg-zinc-50 active:scale-95 transition"
             >
               <ArrowLeft size={18} />
             </button>
-            <h1 className="text-lg font-bold">New Post</h1>
+            <h1 className="text-xl font-extrabold text-black tracking-tight">
+              New Post
+            </h1>
           </div>
 
           <button
             onClick={submitHandler}
             disabled={loading || !image || !caption.trim()}
-            className="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:hover:bg-violet-600 text-white text-xs font-semibold transition shadow-sm"
+            className="px-6 py-2 rounded-full border-2 border-black bg-[#FF6B4A] hover:bg-[#ff5a36] disabled:opacity-40 text-white text-xs font-bold transition shadow-[2px_2px_0px_#000] active:scale-95"
           >
             {loading ? "Sharing..." : "Share"}
           </button>
         </header>
 
-        {/* Content Layout: 2 Columns on desktop, 1 on mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        {/* Content Box */}
+        <div className="flex flex-col gap-5">
           {/* Image Upload Box */}
-          <div className="w-full aspect-square bg-zinc-950 border-2 border-dashed border-zinc-800 rounded-2xl overflow-hidden relative flex flex-col items-center justify-center">
+          <div className="w-full aspect-square bg-white border-2 border-black rounded-[32px] overflow-hidden relative flex flex-col items-center justify-center shadow-[4px_4px_0px_#000]">
             {previewUrl ? (
               <div className="relative w-full h-full group">
                 <img
@@ -113,24 +120,24 @@ const CreatePost = () => {
                 <button
                   type="button"
                   onClick={() => setImage(null)}
-                  className="absolute top-3 right-3 p-2 bg-black/70 hover:bg-black/90 text-white rounded-full transition shadow-lg"
+                  className="absolute top-3.5 right-3.5 p-2 bg-white border-2 border-black text-black rounded-2xl shadow-[2px_2px_0px_#000] hover:bg-red-50 transition"
                   title="Remove image"
                 >
                   <X size={16} />
                 </button>
               </div>
             ) : (
-              <label className="w-full h-full flex flex-col items-center justify-center p-6 cursor-pointer hover:bg-zinc-900/50 transition">
-                <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-violet-400 mb-4 group-hover:scale-105 transition">
+              <label className="w-full h-full flex flex-col items-center justify-center p-6 cursor-pointer bg-[#FED7A5]/20 hover:bg-[#FED7A5]/40 transition">
+                <div className="w-16 h-16 rounded-2xl bg-[#D5F94C] border-2 border-black flex items-center justify-center text-black mb-4 shadow-[2px_2px_0px_#000] group-hover:scale-105 transition">
                   <Upload size={28} />
                 </div>
-                <h3 className="text-sm font-semibold text-white mb-1">
+                <h3 className="text-base font-extrabold text-black mb-1">
                   Choose Photo
                 </h3>
-                <p className="text-xs text-zinc-500 text-center max-w-xs mb-4">
-                  PNG, JPG, WebP up to 10MB
+                <p className="text-xs text-zinc-600 text-center max-w-xs mb-4 font-medium">
+                  PNG, JPG, WebP photos and memories
                 </p>
-                <span className="px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs font-medium hover:border-zinc-500 transition">
+                <span className="px-5 py-2 bg-white border-2 border-black rounded-full text-xs font-bold text-black shadow-[2px_2px_0px_#000] hover:bg-zinc-50 transition">
                   Browse Files
                 </span>
                 <input
@@ -147,19 +154,13 @@ const CreatePost = () => {
             )}
           </div>
 
-          {/* Form Details */}
-          <div className="w-full space-y-5 bg-zinc-950 border border-zinc-800/80 rounded-2xl p-5">
+          {/* Form Card */}
+          <div className="w-full space-y-4 bg-white border-2 border-black rounded-[32px] p-5 shadow-[4px_4px_0px_#000]">
             {/* Caption */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-zinc-300">
-                  Caption
-                </label>
-                <span
-                  className={`text-xs ${
-                    caption.length > 250 ? "text-amber-400" : "text-zinc-500"
-                  }`}
-                >
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="text-xs font-bold text-black">Caption</label>
+                <span className="text-xs text-zinc-500 font-semibold">
                   {caption.length}/280
                 </span>
               </div>
@@ -167,45 +168,51 @@ const CreatePost = () => {
                 value={caption}
                 maxLength={280}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="Write a thoughtful caption, story, or thoughts..."
-                className="w-full h-28 bg-zinc-900/80 border border-zinc-800 rounded-xl p-3 text-xs text-white placeholder:text-zinc-500 outline-none focus:border-violet-500 resize-none transition"
+                placeholder="Golden hour at the old fort..."
+                className="w-full h-24 bg-zinc-50 border-2 border-black rounded-2xl p-3 text-xs text-black placeholder:text-zinc-500 outline-none resize-none"
               />
             </div>
 
-            {/* Location */}
+            {/* Quick Tag Pills */}
             <div>
-              <label className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5 mb-2">
-                <MapPin size={13} className="text-violet-400" />
-                <span>Add Location</span>
+              <label className="text-xs font-bold text-black block mb-1.5">
+                Trending Tags
               </label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. San Francisco, California"
-                className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-zinc-500 outline-none focus:border-violet-500 transition"
-              />
+              <div className="flex flex-wrap gap-1.5">
+                {suggestedTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      if (!tags.includes(tag)) setTags([...tags, tag]);
+                    }}
+                    className="px-3 py-1 rounded-full border-2 border-black bg-white hover:bg-[#D5F94C] text-xs font-bold text-black transition shadow-[1px_1px_0px_#000]"
+                  >
+                    +{tag}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Tags */}
+            {/* Selected Tags */}
             <div>
-              <label className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5 mb-2">
-                <Hash size={13} className="text-violet-400" />
+              <label className="text-xs font-bold text-black flex items-center gap-1.5 mb-1.5">
+                <Hash size={13} />
                 <span>Tags</span>
               </label>
 
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-2.5">
+                <div className="flex flex-wrap gap-1.5 mb-2">
                   {tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-medium"
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#D5F94C] border-2 border-black text-black text-xs font-bold shadow-[1px_1px_0px_#000]"
                     >
                       #{tag}
                       <button
                         type="button"
                         onClick={() => handleRemoveTag(tag)}
-                        className="text-violet-300 hover:text-white"
+                        className="text-black hover:text-red-600"
                       >
                         <X size={12} />
                       </button>
@@ -219,8 +226,23 @@ const CreatePost = () => {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleAddTag}
-                placeholder="Type a tag and press Enter..."
-                className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-zinc-500 outline-none focus:border-violet-500 transition"
+                placeholder="Type tag and press Enter..."
+                className="w-full bg-zinc-50 border-2 border-black rounded-2xl px-3.5 py-2 text-xs text-black placeholder:text-zinc-500 outline-none"
+              />
+            </div>
+
+            {/* Location */}
+            <div>
+              <label className="text-xs font-bold text-black flex items-center gap-1.5 mb-1.5">
+                <MapPin size={13} className="text-[#FF6B4A]" />
+                <span>Add Location</span>
+              </label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Old Fort, Delhi"
+                className="w-full bg-zinc-50 border-2 border-black rounded-2xl px-3.5 py-2 text-xs text-black placeholder:text-zinc-500 outline-none"
               />
             </div>
 
@@ -229,9 +251,9 @@ const CreatePost = () => {
               type="button"
               onClick={submitHandler}
               disabled={loading || !image || !caption.trim()}
-              className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:hover:bg-violet-600 font-semibold text-xs text-white transition shadow-sm mt-4"
+              className="w-full py-3.5 rounded-full bg-[#FF6B4A] hover:bg-[#ff5a36] disabled:opacity-40 text-white font-extrabold text-xs uppercase tracking-wider border-2 border-black transition shadow-[3px_3px_0px_#000] active:scale-95 mt-2"
             >
-              {loading ? "Sharing..." : "Share Post"}
+              {loading ? "Sharing Post..." : "Share to Pixlify"}
             </button>
           </div>
         </div>
