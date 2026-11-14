@@ -2,6 +2,11 @@ const express = require("express");
 const path = require("path");
 const app = express();
 app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 const cors = require("cors");
 
 app.use(
